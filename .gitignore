@@ -1,0 +1,15 @@
+# Dependências Node / Electron
+node_modules/
+
+# Pastas de build / empacotamento futuro
+dist/
+out/
+release/
+
+# Arquivos de sistema (macOS)
+.DS_Store
+
+# Ambiente Python e variáveis sensíveis
+venv/
+__pycache__/
+.env

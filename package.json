@@ -1,0 +1,23 @@
+{
+  "name": "pharmastock-frontend",
+  "version": "0.1.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaiobarbosa/pharmaStock.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/kaiobarbosa/pharmaStock/issues"
+  },
+  "homepage": "https://github.com/kaiobarbosa/pharmaStock#readme",
+  "devDependencies": {
+    "electron": "^45.3.2"
+  }
+}
