@@ -19,7 +19,7 @@ function createWindow() {
   });
 
   // Carrega a tela inicial do sistema
-  mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
+  mainWindow.loadFile(path.join(__dirname, 'public', 'index.html'));
 }
 
 app.whenReady().then(() => {
