@@ -3,14 +3,11 @@ const path = require('path');
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 800,
-    minWidth: 1024,
-    minHeight: 700,
+    fullscreen: true,
     center: true,
-    title: 'pharmaStock - Gestão Unificada de Estoque',
+    title: 'PharmaStock | Gestão Unificada de Estoque',
     autoHideMenuBar: true, // Oculta a barra superior padrão (File, Edit, View)
-    backgroundColor: '#0f172a', // Evita flash branco ao abrir a janela
+    backgroundColor: '#10110f', // Mantém o tema grafite durante a abertura
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true, // Isola o contexto web por segurança
@@ -19,7 +16,9 @@ function createWindow() {
   });
 
   // Carrega a tela inicial do sistema
-  mainWindow.loadFile(path.join(__dirname, 'public', 'index.html'));
+  mainWindow.loadFile(
+    path.join(__dirname, 'frontend', 'src', 'screens', 'create_account_screeen.html')
+  );
 }
 
 app.whenReady().then(() => {

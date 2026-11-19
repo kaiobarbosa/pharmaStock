@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10110f" />
+    <title>PharmaStock | Cadastro do diretor</title>
+    <link rel="stylesheet" href="../style/padronization.css" />
+    <link rel="stylesheet" href="../style/create_account_screen.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Identidade do PharmaStock">
+        <div class="brand-row">
+          <span class="brand-mark" aria-hidden="true">P</span>
+          <span class="brand-copy">
+            <span class="brand-kicker">gestão farmacêutica</span>
+            <span class="brand-name">PharmaStock</span>
+          </span>
+        </div>
+
+        <div class="sidebar-note">
+          <span class="sidebar-note__rule" aria-hidden="true"></span>
+          <p>Primeiro acesso</p>
+          <span class="sidebar-note__detail">Cadastro da diretoria</span>
+        </div>
+
+        <div class="sidebar-footer">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>Acesso restrito</span>
+        </div>
+      </aside>
+
+      <main class="hero-section">
+        <header class="hero-header">
+          <div>
+            <p class="hero-header__eyebrow">Configuração inicial</p>
+            <p class="hero-header__title">Conta administrativa</p>
+          </div>
+          <span class="hero-header__context">Diretoria da rede</span>
+        </header>
+
+        <section class="hero-content" aria-labelledby="account-title">
+          <div class="auth-shell">
+            <div class="auth-card">
+              <div class="auth-card__heading">
+                <p class="section-kicker">PharmaStock <span aria-hidden="true">/</span> Nova conta</p>
+                <h1 id="account-title">Cadastro do diretor</h1>
+                <p class="auth-card__description">
+                  Crie o acesso responsável pela gestão da rede farmacêutica.
+                </p>
+              </div>
+
+              <form class="auth-form" method="post" autocomplete="on">
+                <div class="field">
+                  <label for="first-name">Nome</label>
+                  <input
+                    id="first-name"
+                    name="first_name"
+                    type="text"
+                    placeholder="Nome..."
+                    autocomplete="given-name"
+                    required
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="last-name">Sobrenome</label>
+                  <input
+                    id="last-name"
+                    name="last_name"
+                    type="text"
+                    placeholder="Sobrenome..."
+                    autocomplete="family-name"
+                    required
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="cpf">CPF</label>
+                  <input
+                    id="cpf"
+                    name="cpf"
+                    type="text"
+                    placeholder="000.000.000-00"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    maxlength="14"
+                    required
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="email">E-mail</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="diretor@empresa.com"
+                    autocomplete="email"
+                    required
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="password">Senha</label>
+                  <div class="input-shell">
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      placeholder="Crie uma senha..."
+                      autocomplete="new-password"
+                      required
+                    />
+                    <button class="password-toggle" type="button" aria-label="Visualizar senha" title="Visualizar senha">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M2.8 12s3.25-5.4 9.2-5.4 9.2 5.4 9.2 5.4-3.25 5.4-9.2 5.4S2.8 12 2.8 12Z" />
+                        <circle cx="12" cy="12" r="2.35" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="password-confirmation">Confirmação de senha</label>
+                  <input
+                    id="password-confirmation"
+                    name="password_confirmation"
+                    type="password"
+                    placeholder="Digite a senha novamente..."
+                    autocomplete="new-password"
+                    required
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="internal-code">Código interno</label>
+                  <input
+                    id="internal-code"
+                    name="internal_code"
+                    type="text"
+                    placeholder="Código interno..."
+                    autocomplete="off"
+                    required
+                  />
+                </div>
+
+                <button class="primary-button" type="submit">
+                  Criar conta
+                  <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                    <path d="M4 10h11M10 5l5 5-5 5" />
+                  </svg>
+                </button>
+              </form>
+
+              <p class="auth-card__footnote">
+                <span class="footnote-mark" aria-hidden="true">i</span>
+                Os dados desta conta serão usados para identificar a diretoria da rede.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

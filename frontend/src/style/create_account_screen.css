@@ -1,0 +1,379 @@
+.sidebar .brand-row {
+  align-self: flex-start;
+}
+
+.sidebar-note {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 0 2px 2px;
+}
+
+.sidebar-note__rule {
+  width: 30px;
+  height: 1px;
+  margin-bottom: 4px;
+  background-color: var(--accent-500);
+}
+
+.sidebar-note p {
+  color: var(--text-100);
+  font-family: var(--font-title);
+  font-size: 0.94rem;
+}
+
+.sidebar-note__detail {
+  color: var(--text-300);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-300);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background-color: var(--accent-500);
+  box-shadow: 0 0 0 3px var(--highlight);
+}
+
+.hero-header__eyebrow {
+  margin-bottom: 4px;
+  color: var(--accent-400);
+  font-size: 0.67rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero-header__title {
+  color: var(--text-100);
+  font-family: var(--font-title);
+  font-size: 1.02rem;
+}
+
+.hero-header__context {
+  padding: 7px 11px;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  color: var(--text-200);
+  font-size: 0.74rem;
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-shell {
+  width: min(100%, 720px);
+}
+
+.auth-card {
+  padding: 34px clamp(22px, 4vw, 48px) 24px;
+}
+
+.auth-card__heading {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.section-kicker {
+  margin-bottom: 10px;
+  color: var(--accent-400);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.section-kicker span {
+  padding: 0 5px;
+  color: var(--text-300);
+}
+
+.auth-card h1 {
+  font-size: clamp(1.75rem, 2.5vw, 2.35rem);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.auth-card__description {
+  max-width: 420px;
+  margin: 10px auto 0;
+  color: var(--text-200);
+  font-size: 0.96rem;
+  line-height: 1.55;
+}
+
+.auth-form {
+  width: min(100%, 500px);
+  align-items: center;
+  gap: 12px;
+  margin: 0 auto;
+}
+
+.auth-form .field {
+  width: clamp(240px, 20vw, 440px);
+  max-width: 100%;
+}
+
+.auth-form label {
+  font-size: 0.82rem;
+}
+
+.auth-form input,
+.auth-form .input-shell {
+  width: 100%;
+}
+
+.auth-form input {
+  height: 50px;
+  min-height: 50px;
+}
+
+.auth-form .input-shell input {
+  padding-right: 48px;
+}
+
+.auth-form .primary-button {
+  width: clamp(240px, 20vw, 440px);
+  max-width: 100%;
+  min-height: 48px;
+  margin-top: 8px;
+}
+
+.primary-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+  transition: transform 0.2s ease;
+}
+
+.primary-button:hover svg {
+  transform: translateX(2px);
+}
+
+.auth-card__footnote {
+  display: flex;
+  max-width: 500px;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+  margin: 22px auto 0;
+  color: var(--text-300);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.footnote-mark {
+  display: inline-grid;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  place-items: center;
+  margin-top: 1px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--accent-400);
+  font-family: var(--font-title);
+  font-size: 0.68rem;
+  line-height: 1;
+}
+
+@media (min-width: 769px) and (max-width: 1760px) {
+  .sidebar .brand-row {
+    align-self: center;
+  }
+
+  .sidebar .brand-copy {
+    display: none;
+  }
+}
+
+@media (max-height: 850px) {
+  .hero-content {
+    align-items: flex-start;
+  }
+
+  .auth-shell {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .auth-card {
+    padding-top: 24px;
+    padding-bottom: 18px;
+  }
+
+  .auth-card__heading {
+    margin-bottom: 18px;
+  }
+
+  .auth-form {
+    gap: 9px;
+  }
+
+  .auth-form input {
+    height: 46px;
+    min-height: 46px;
+  }
+
+  .auth-form .primary-button {
+    min-height: 44px;
+    margin-top: 5px;
+  }
+
+  .auth-card__footnote {
+    margin-top: 16px;
+  }
+}
+
+@media (max-height: 640px) {
+  .auth-card {
+    padding-top: 16px;
+    padding-bottom: 14px;
+  }
+
+  .auth-card__heading {
+    margin-bottom: 12px;
+  }
+
+  .section-kicker {
+    margin-bottom: 5px;
+  }
+
+  .auth-card__description {
+    margin-top: 5px;
+    font-size: 0.88rem;
+  }
+
+  .auth-form {
+    gap: 6px;
+  }
+
+  .auth-form input {
+    height: 40px;
+    min-height: 40px;
+  }
+
+  .auth-card__footnote {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    align-items: center;
+  }
+
+  .sidebar .brand-row {
+    align-self: center;
+  }
+
+  .brand-copy,
+  .sidebar-note__detail,
+  .sidebar-footer > span:last-child {
+    display: none;
+  }
+
+  .sidebar-note {
+    align-items: center;
+    padding: 0;
+  }
+
+  .sidebar-note p {
+    font-size: 0.72rem;
+    text-align: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  .hero-header__context {
+    font-size: 0.68rem;
+  }
+
+  .auth-card {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    min-width: 58px;
+    padding: 12px 6px;
+  }
+
+  .sidebar-note__rule {
+    width: 22px;
+  }
+
+  .hero-header {
+    min-height: 58px;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .hero-header__eyebrow {
+    font-size: 0.57rem;
+  }
+
+  .hero-header__title {
+    font-size: 0.92rem;
+  }
+
+  .hero-header__context {
+    padding: 6px 8px;
+    font-size: 0.6rem;
+  }
+
+  .hero-content {
+    padding: 14px 12px;
+  }
+
+  .auth-card {
+    padding: 22px 16px 18px;
+  }
+
+  .auth-card__heading {
+    margin-bottom: 20px;
+  }
+
+  .auth-card h1 {
+    font-size: 1.68rem;
+  }
+
+  .auth-card__description {
+    font-size: 0.88rem;
+  }
+
+  .auth-form .field,
+  .auth-form .primary-button {
+    width: 100%;
+  }
+
+  .auth-form input {
+    height: 44px;
+    min-height: 44px;
+    font-size: 0.86rem;
+  }
+
+  .auth-card__footnote {
+    font-size: 0.7rem;
+  }
+}
