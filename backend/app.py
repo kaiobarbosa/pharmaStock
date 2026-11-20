@@ -5,14 +5,16 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 
 from backend.src.login_and_create_account.presentation.create_user_presentation import (
-    blueprint_create_director_account,
-)
+    blueprint_create_director_account,)
+from backend.src.login_and_create_account.presentation.verify_director_exist_presentation import (
+    blueprint_check_director_exists,)   
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": ["null", "file://"]}})
 app.register_blueprint(blueprint_create_director_account)
+app.register_blueprint(blueprint_check_director_exists)
 
 
 @app.get("/health")

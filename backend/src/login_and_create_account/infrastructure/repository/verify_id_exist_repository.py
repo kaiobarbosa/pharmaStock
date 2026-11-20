@@ -14,3 +14,21 @@ def verify_id_exist(id_usuario):
             cursor.close()
     finally:
         connection.close()
+
+def verify_director_exist():
+
+    sql = "SELECT 1 FROM usuario WHERE LOWER(tipo_usuario) = 'diretor' LIMIT 1"
+
+    connection = conectar_banco()
+    if not connection:
+        raise ConnectionError("Não foi possível conectar ao banco de dados.")
+
+    try:
+        cursor = connection.cursor()
+        try:
+            cursor.execute(sql)
+            return cursor.fetchone() is not None
+        finally:
+            cursor.close()
+    finally:
+        connection.close()
