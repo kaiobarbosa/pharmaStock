@@ -1,73 +1,36 @@
+import re
+
+
+def normalize_cpf(cpf):
+    if not isinstance(cpf, str):
+        return ""
+    return re.sub(r"\D", "", cpf)
+
+
 def verify_director_null_fields(nome, sobrenome, cpf, email, senha, codigo_interno):
-    if not nome or not sobrenome or not cpf or not email or not senha or not codigo_interno:
-        return False
-    return True
+    values = (nome, sobrenome, cpf, email, senha, codigo_interno)
+    return all(isinstance(value, str) and value.strip() for value in values)
+
 
 def verify_director_cpf_format(cpf):
-    if len(cpf) != 11 or not cpf.isdigit():
-
+    cpf = normalize_cpf(cpf)
+    if len(cpf) != 11 or cpf == cpf[0] * 11:
         return False
+
+    for length in (9, 10):
+        total = sum(int(cpf[index]) * (length + 1 - index) for index in range(length))
+        digit = (total * 10) % 11
+        if digit == 10:
+            digit = 0
+        if digit != int(cpf[length]):
+            return False
     return True
+
 
 def validate_email(email):
-
     if not isinstance(email, str):
         return False
-
-    if " " in email:
+    email = email.strip()
+    if len(email) > 254:
         return False
-
-    if email.count("@") != 1:
-        return False
-
-    usuario, dominio = email.split("@")
-
-    if not usuario or not dominio:
-        return False
-
-    if len(email) > 254 or len(usuario) > 64:
-        return False
-
-    if ".." in email:
-        return False
-
-    if usuario.startswith(".") or usuario.endswith("."):
-        return False
-
-    caracteres_usuario = (
-        "abcdefghijklmnopqrstuvwxyz"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "0123456789"
-        "!#$%&'*+-/=?^_`{|}~."
-    )
-
-    for caractere in usuario:
-        if caractere not in caracteres_usuario:
-            return False
-
-    if "." not in dominio:
-        return False
-
-    if dominio.startswith(".") or dominio.endswith("."):
-        return False
-
-    partes = dominio.split(".")
-
-    for parte in partes:
-
-        if not parte:
-            return False
-
-        if parte.startswith("-") or parte.endswith("-"):
-            return False
-
-        for caractere in parte:
-            if not (
-                caractere.isalnum() or caractere == "-"
-            ):
-                return False
-
-    if len(partes[-1]) < 2:
-        return False
-
-    return True
+    return re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email) is not None

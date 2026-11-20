@@ -152,6 +152,28 @@
   margin-top: 8px;
 }
 
+.auth-form .primary-button:disabled {
+  cursor: progress;
+  opacity: 0.78;
+}
+
+.form-feedback {
+  width: clamp(240px, 20vw, 440px);
+  max-width: 100%;
+  color: var(--text-200);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.form-feedback[data-kind="success"] {
+  color: var(--success);
+}
+
+.form-feedback[data-kind="error"] {
+  color: var(--danger);
+}
+
 .primary-button svg {
   width: 18px;
   height: 18px;
@@ -363,7 +385,8 @@
   }
 
   .auth-form .field,
-  .auth-form .primary-button {
+  .auth-form .primary-button,
+  .form-feedback {
     width: 100%;
   }
 

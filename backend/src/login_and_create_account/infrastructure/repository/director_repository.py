@@ -1,94 +1,121 @@
-from configuration.database_connection import conectar_banco
+from mysql.connector import Error, IntegrityError
+
+from backend.configuration.database_connection import conectar_banco
+
+
+class DuplicateDirectorData(Exception):
+    """Raised when email, CPF, or internal code already belongs to an account."""
+
+
+class DirectorRepositoryError(Exception):
+    """Raised when a director record cannot be stored."""
+
+
+def create_new_director(
+    id_usuario,
+    nome,
+    sobrenome,
+    email,
+    cpf,
+    tipo_usuario,
+    ativo,
+    id_funcional,
+    password,
+    codigo_interno,
+):
+    if tipo_usuario != "diretor":
+        raise DirectorRepositoryError("Este repositório aceita apenas contas de diretor.")
+
+    id_filial = "Diretoria"
+    connection = conectar_banco()
+
+    try:
+
+       
+        cursor = connection.cursor()
+        try:
+            cursor.execute(
+                """
+                SELECT 1 FROM usuario
+                WHERE email_usuario = %s OR cpf_usuario = %s
+                LIMIT 1
+                """,
+                (email, cpf),
+            )
+            if cursor.fetchone():
+                raise DuplicateDirectorData
+
+            cursor.execute(
+                "SELECT 1 FROM funcionario WHERE codigo_interno = %s LIMIT 1",
+                (codigo_interno,),
+            )
+            if cursor.fetchone():
+                raise DuplicateDirectorData
+
+            cursor.execute(
+                """
+                INSERT INTO usuario
+                    (id_usuario, nome_usuario, sobrenome_usuario, email_usuario,
+                     cpf_usuario, tipo_usuario, ativo, criado_em)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                """,
+                (id_usuario, nome, sobrenome, email, cpf, tipo_usuario, ativo),
+            )
+            cursor.execute(
+                """
+                INSERT INTO funcionario
+                    (id_funcionario, senha_funcionario, email_verificado,
+                     id_filial, crf_funcionario, codigo_interno, id_usuario)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """,
+                (id_funcional, password, False, id_filial, "N/A", codigo_interno, id_usuario),
+            )
+            connection.commit()
+        finally:
+            cursor.close()
+    except DuplicateDirectorData:
+        connection.rollback()
+        raise
+    except IntegrityError as error:
+        connection.rollback()
+        if error.errno == 1062:
+            raise DuplicateDirectorData from error
+        raise DirectorRepositoryError from error
+    except Error as error:
+        connection.rollback()
+        raise DirectorRepositoryError from error
+    finally:
+        connection.close()
+
+    return True
 
 
 def verify_director_exists(codigo_interno):
-    sql = "select id_funcionario from funcionario where codigo_interno = %s;"
-
     connection = conectar_banco()
-    cursor = connection.cursor(dictionary=True)
-
     try:
-        cursor.execute(sql, (codigo_interno,))
-        diretor = cursor.fetchone()
-        return diretor is not None
+        cursor = connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT 1 FROM funcionario WHERE codigo_interno = %s LIMIT 1",
+                (codigo_interno,),
+            )
+            return cursor.fetchone() is not None
+        finally:
+            cursor.close()
     finally:
-        cursor.close()
         connection.close()
 
 
 def verify_director_email_exists(email):
-    sql = "select * from usuario where email_usuario = %s;"
-
     connection = conectar_banco()
-    cursor = connection.cursor(dictionary=True)
-
     try:
-        cursor.execute(sql, (email,))
-        funcionarios_retornados = cursor.fetchall()
-        return funcionarios_retornados
+        cursor = connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT 1 FROM usuario WHERE email_usuario = %s LIMIT 1", (email,)
+            )
+            return cursor.fetchone() is not None
+        finally:
+            cursor.close()
     finally:
-        cursor.close()
         connection.close()
-
-
-def create_new_director(id_user, nome, sobrenome, email, cpf, tipo_usuario, ativo, criado_em, id_funcional, password, id_filial,  crf, codigo_interno):
-    sql = "insert into usuario (id_usuario, nome_usuario, sobrenome_usuario, email_usuario, cpf_usuario, tipo_usuario, ativo, criado_em) values (%s, %s, %s, %s, %s, %s, %s, %s);"
-
-    connection = conectar_banco()
-    cursor = connection.cursor()
-
-    try:
-        cursor.execute(sql,(id_user, nome, sobrenome, email, cpf, tipo_usuario, ativo, criado_em), )
-
-        if cursor.rowcount == 1:
-            status_funcional = create_director_functional(id_funcional=id_funcional, password=password, email=email, id_filial=id_filial, crf=crf or "N/A", codigo_interno=codigo_interno, id_usuario=id_user, connection=connection,)
-
-            if status_funcional == 200:
-                connection.commit()
-                return 200
-
-        connection.rollback()
-        return 500
-
-    except Exception as erro:
-        connection.rollback()
-        print(f"Erro ao criar conta de diretor: {erro}")
-        return 500
-
-    finally:
-        cursor.close()
-        connection.close()
-
-
-def create_director_functional(id_funcional, password, email, id_filial, crf, codigo_interno, id_usuario, connection=None,):
-    
-    sql = "insert into funcionario (id_funcionario, senha_funcionario, email_verificado, id_filial, crf_funcionario, codigo_interno, id_usuario) values (%s, %s, %s, %s, %s, %s, %s);"
-
-    conexao_propria = connection is None
-    if conexao_propria:
-        connection = conectar_banco()
-
-    cursor = connection.cursor()
-
-    try:
-        cursor.execute(sql,(id_funcional,password,email,id_filial,crf or "N/A",codigo_interno, id_usuario,),)
-
-        if cursor.rowcount == 1:
-            if conexao_propria:
-                connection.commit()
-            return 200
-
-        if conexao_propria:
-            connection.rollback()
-        return 500
-
-    except Exception as erro:
-        if conexao_propria:
-            connection.rollback()
-            return 500
-        raise erro
-
-    finally:
-        cursor.close()
-        if conexao_propria:
-            connection.close()

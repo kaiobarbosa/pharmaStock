@@ -1,31 +1,31 @@
 import os
+
 import mysql.connector
-from mysql.connector import Error
 from dotenv import load_dotenv
+from mysql.connector import Error
+
+
+class DatabaseUnavailable(Exception):
+    """Raised when the application cannot establish a MySQL connection."""
+
 
 def conectar_banco():
+    load_dotenv()
+
+    config = {
+        "host": os.getenv("DB_HOST"),
+        "user": os.getenv("DB_USER"),
+        "password": os.getenv("DB_PASSWORD"),
+        "database": os.getenv("DB_NAME"),
+        "connection_timeout": int(os.getenv("DB_CONNECT_TIMEOUT", "5")),
+    }
+    missing = [key for key in ("host", "user", "database") if not config[key]]
+    if config["password"] is None:
+        missing.append("password")
+    if missing:
+        raise DatabaseUnavailable("Configuração do banco incompleta.")
+
     try:
-
-        load_dotenv()
-       
-        conexao = mysql.connector.connect(
-            host=os.getenv('DB_HOST'),
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASSWORD'),
-            database=os.getenv('DB_NAME')
-        )
-
-        if conexao.is_connected():
-            db_info = conexao.get_server_info()
-            print(f"Conectado ao servidor MySQL versão: {db_info}")
-
-            cursor = conexao.cursor()
-            cursor.execute("SELECT DATABASE();")
-            linha = cursor.fetchone()
-            print(f"Você está conectado ao banco: {linha[0]}")
-
-    except Error as e:
-        print(f"Erro ao conectar ao MySQL: {e}")
-        conexao = None
-
-    return conexao
+        return mysql.connector.connect(**config)
+    except Error as error:
+        raise DatabaseUnavailable("Não foi possível conectar ao banco de dados.") from error
