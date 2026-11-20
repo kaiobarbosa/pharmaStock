@@ -10,6 +10,7 @@ blueprint_check_director_exists = Blueprint(
 
 
 
+@blueprint_check_director_exists.get("/api/check_director_exists")
 @blueprint_check_director_exists.get("/check_director_exists")
 def check_director_exists():
     resposta, status_code = verify_first_use()

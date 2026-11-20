@@ -1,4 +1,7 @@
-from infrastructure.repository.verify_id_exist_repository import verify_director_exist
+from backend.configuration.database_connection import DatabaseUnavailable
+from backend.src.login_and_create_account.infrastructure.repository.verify_id_exist_repository import (
+    verify_director_exist,
+)
 
 def verify_first_use() -> tuple[dict, int]:
 
@@ -9,7 +12,7 @@ def verify_first_use() -> tuple[dict, int]:
             "requires_initial_setup": not existe_diretor,
         }, 200
 
-    except ConnectionError as erro:
-        return {"erro": str(erro)}, 503
-    except Exception as erro:
-        return {"erro": f"Falha ao verificar existência de diretor: {erro}"}, 500
+    except DatabaseUnavailable:
+        return {"ok": False, "message": "Banco de dados indisponível."}, 503
+    except Exception:
+        return {"ok": False, "message": "Falha ao verificar o primeiro acesso."}, 500

@@ -1,11 +1,112 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - pharmaStock</title>
-</head>
-<body>
-    
-</body>
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10110f" />
+    <title>PharmaStock | Login</title>
+    <link rel="stylesheet" href="../src/style/padronization.css" />
+    <link rel="stylesheet" href="../src/style/index.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Identidade do PharmaStock">
+        <div class="brand-row">
+          <span class="brand-mark" aria-hidden="true">P</span>
+          <span class="brand-copy">
+            <span class="brand-kicker">gestão farmacêutica</span>
+            <span class="brand-name">PharmaStock</span>
+          </span>
+        </div>
+
+        <div class="sidebar-note">
+          <span class="sidebar-note__rule" aria-hidden="true"></span>
+          <p>Acesso seguro</p>
+          <span class="sidebar-note__detail">Gestão unificada da rede</span>
+        </div>
+
+        <div class="sidebar-footer">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>Ambiente corporativo</span>
+        </div>
+      </aside>
+
+      <main class="hero-section">
+        <header class="hero-header">
+          <div>
+            <p class="hero-header__eyebrow">PharmaStock</p>
+            <p class="hero-header__title">Gestão unificada de estoque</p>
+          </div>
+          <span class="hero-header__context">Acesso da equipe</span>
+        </header>
+
+        <section class="hero-content" aria-labelledby="login-title">
+          <div class="auth-shell">
+            <div class="auth-card login-card">
+              <div class="auth-card__heading">
+                <p class="section-kicker">Bem-vindo de volta</p>
+                <h1 id="login-title">Entrar no sistema</h1>
+                <p class="auth-card__description">
+                  Informe seus dados para acessar o PharmaStock.
+                </p>
+              </div>
+
+              <form class="auth-form login-form" autocomplete="on">
+                <div class="field">
+                  <label for="email">E-mail</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Email.."
+                    autocomplete="username"
+                    required
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="password">Senha</label>
+                  <div class="input-shell">
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      placeholder="Senha.."
+                      autocomplete="current-password"
+                      required
+                    />
+                    <button
+                      class="password-toggle"
+                      type="button"
+                      data-password-toggle="password"
+                      aria-label="Visualizar senha"
+                      title="Visualizar senha"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M2.8 12s3.25-5.4 9.2-5.4 9.2 5.4 9.2 5.4-3.25 5.4-9.2 5.4S2.8 12 2.8 12Z" />
+                        <circle cx="12" cy="12" r="2.35" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <button class="link-button forgot-password" type="button">
+                  Esqueceu a senha?
+                </button>
+
+                <button class="primary-button login-submit" type="button">
+                  Entrar
+                  <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                    <path d="M4 10h11M10 5l5 5-5 5" />
+                  </svg>
+                </button>
+                <p id="startup-feedback" class="startup-feedback" role="alert" hidden></p>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="../src/js/index.js" defer></script>
+  </body>
 </html>

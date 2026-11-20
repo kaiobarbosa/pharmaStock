@@ -1,5 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const { spawn } = require('child_process');
+const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
@@ -29,7 +30,7 @@ function startBackend() {
     cwd: __dirname,
     env: {
       ...process.env,
-      FLASK_PORT: process.env.FLASK_PORT || '5000',
+      FLASK_PORT: process.env.FLASK_PORT || '5055',
       PYTHONUNBUFFERED: '1',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -62,7 +63,72 @@ function stopBackend() {
   }
 }
 
-function createWindow() {
+function requestFirstAccess() {
+  const port = Number(process.env.FLASK_PORT || 5055);
+
+  return new Promise((resolve, reject) => {
+    const request = http.get({
+      hostname: '127.0.0.1',
+      port,
+      path: '/api/check_director_exists',
+      timeout: 2000,
+    }, (response) => {
+      let body = '';
+      response.setEncoding('utf8');
+      response.on('data', (chunk) => { body += chunk; });
+      response.on('end', () => {
+        if (response.statusCode !== 200) {
+          const error = new Error(`A checagem de primeiro acesso retornou HTTP ${response.statusCode}.`);
+          error.statusCode = response.statusCode;
+          reject(error);
+          return;
+        }
+
+        try {
+          const result = JSON.parse(body);
+          if (typeof result.requires_initial_setup !== 'boolean') {
+            throw new Error('Resposta inválida da checagem de primeiro acesso.');
+          }
+          resolve(result.requires_initial_setup);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+
+    request.on('timeout', () => request.destroy(new Error('Tempo limite aguardando o Flask.')));
+    request.on('error', reject);
+  });
+}
+
+const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+async function getInitialScreen() {
+  let lastError;
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    try {
+      const requiresSetup = await requestFirstAccess();
+      return {
+        path: requiresSetup
+          ? path.join(__dirname, 'frontend', 'src', 'screens', 'create_account_screeen.html')
+          : path.join(__dirname, 'frontend', 'public', 'index.html'),
+        startupError: false,
+      };
+    } catch (error) {
+      lastError = error;
+      if (error.statusCode) break;
+      await wait(300);
+    }
+  }
+
+  console.error(`Não foi possível verificar o primeiro acesso: ${lastError?.message}`);
+  return {
+    path: path.join(__dirname, 'frontend', 'public', 'index.html'),
+    startupError: true,
+  };
+}
+
+function createWindow(initialScreen) {
   const mainWindow = new BrowserWindow({
     fullscreen: true,
     center: true,
@@ -76,20 +142,20 @@ function createWindow() {
     }
   });
 
-  // Carrega a tela inicial do sistema
-  mainWindow.loadFile(
-    path.join(__dirname, 'frontend', 'src', 'screens', 'create_account_screeen.html')
-  );
+  mainWindow.loadFile(initialScreen.path, {
+    query: initialScreen.startupError ? { startup_error: 'true' } : {},
+  });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   startBackend();
-  createWindow();
+  const initialScreen = await getInitialScreen();
+  createWindow(initialScreen);
 
   // No macOS, recria a janela se o ícone do Dock for clicado sem janelas abertas
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      getInitialScreen().then(createWindow);
     }
   });
 });

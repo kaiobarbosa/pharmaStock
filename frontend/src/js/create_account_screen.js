@@ -1,11 +1,10 @@
-const API_PORT = window.desktopEnv?.apiPort || '5000';
+const API_PORT = window.desktopEnv?.apiPort || '5055';
 const API_URL = `http://127.0.0.1:${API_PORT}/api/create_director_account`;
 
 const accountForm = document.querySelector('.auth-form');
 const feedback = document.querySelector('#form-feedback');
 const submitButton = accountForm?.querySelector('[type="submit"]');
-const passwordInput = document.querySelector('#password');
-const passwordToggle = document.querySelector('.password-toggle');
+const passwordToggles = document.querySelectorAll('[data-password-toggle]');
 
 function showFeedback(message, kind) {
   feedback.textContent = message;
@@ -13,11 +12,15 @@ function showFeedback(message, kind) {
   feedback.hidden = false;
 }
 
-passwordToggle?.addEventListener('click', () => {
-  const shouldShow = passwordInput.type === 'password';
-  passwordInput.type = shouldShow ? 'text' : 'password';
-  passwordToggle.setAttribute('aria-label', shouldShow ? 'Ocultar senha' : 'Visualizar senha');
-  passwordToggle.title = shouldShow ? 'Ocultar senha' : 'Visualizar senha';
+passwordToggles.forEach((toggle) => {
+  toggle.addEventListener('click', () => {
+    const input = document.getElementById(toggle.dataset.passwordToggle);
+    const shouldShow = input.type === 'password';
+    input.type = shouldShow ? 'text' : 'password';
+    const label = shouldShow ? 'Ocultar senha' : 'Visualizar senha';
+    toggle.setAttribute('aria-label', label);
+    toggle.title = label;
+  });
 });
 
 accountForm?.addEventListener('submit', async (event) => {
@@ -54,12 +57,8 @@ accountForm?.addEventListener('submit', async (event) => {
     }
 
     accountForm.reset();
-    if (passwordInput.type === 'text') {
-      passwordInput.type = 'password';
-      passwordToggle.setAttribute('aria-label', 'Visualizar senha');
-      passwordToggle.title = 'Visualizar senha';
-    }
     showFeedback(result.message || 'Conta criada com sucesso.', 'success');
+    window.location.replace('../../public/index.html');
   } catch (error) {
     showFeedback(
       'Não foi possível conectar ao servidor. Verifique se o backend Flask iniciou corretamente.',

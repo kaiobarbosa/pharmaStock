@@ -8,9 +8,9 @@ Aplicação desktop construída com Electron, frontend HTML/CSS/JavaScript e API
 2. Instale as dependências: `pip install -r backend/requirements.txt`.
 3. Crie um arquivo `.env` na raiz com `DB_HOST`, `DB_USER`, `DB_PASSWORD` e `DB_NAME`.
 4. O cadastro do primeiro diretor não requer registro na tabela `filial`: `funcionario.id_filial` deve aceitar `NULL` para esse usuário, que responde pela rede inteira.
-5. Inicie a aplicação com `npm start`. O Electron inicia o Flask em `127.0.0.1:5000` junto com a tela de cadastro.
+5. Inicie a aplicação com `npm start`. O Electron inicia o Flask em `127.0.0.1:5055` junto com a tela inicial escolhida após a checagem do primeiro acesso.
 
-O executável Python pode ser definido pela variável `PHARMASTOCK_PYTHON`. A porta da API pode ser alterada por `FLASK_PORT`.
+O executável Python pode ser definido pela variável `PHARMASTOCK_PYTHON`. A porta padrão da API é `5055` e pode ser alterada por `FLASK_PORT`.
 
 ## Endpoint de cadastro
 

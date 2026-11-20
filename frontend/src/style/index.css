@@ -1,0 +1,254 @@
+.sidebar-note {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 0 2px 2px;
+}
+
+.sidebar-note__rule {
+  width: 30px;
+  height: 1px;
+  margin-bottom: 4px;
+  background-color: var(--accent-500);
+}
+
+.sidebar-note p {
+  color: var(--text-100);
+  font-family: var(--font-title);
+  font-size: 0.94rem;
+}
+
+.sidebar-note__detail {
+  color: var(--text-300);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-300);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background-color: var(--accent-500);
+  box-shadow: 0 0 0 3px var(--highlight);
+}
+
+.hero-header__eyebrow {
+  margin-bottom: 4px;
+  color: var(--accent-400);
+  font-size: 0.67rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero-header__title {
+  color: var(--text-100);
+  font-family: var(--font-title);
+  font-size: 1.02rem;
+}
+
+.hero-header__context {
+  padding: 7px 11px;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  color: var(--text-200);
+  font-size: 0.74rem;
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-shell {
+  width: min(100%, 460px);
+}
+
+.login-card {
+  padding: 38px clamp(24px, 4vw, 44px);
+}
+
+.auth-card__heading {
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.section-kicker {
+  margin-bottom: 10px;
+  color: var(--accent-400);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.login-card h1 {
+  font-size: clamp(1.8rem, 2.5vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.auth-card__description {
+  max-width: 360px;
+  margin: 10px auto 0;
+  color: var(--text-200);
+  font-size: 0.96rem;
+  line-height: 1.55;
+}
+
+.login-form {
+  width: 100%;
+  gap: 16px;
+}
+
+.login-form .field {
+  width: 100%;
+}
+
+.login-form label {
+  font-size: 0.82rem;
+}
+
+.login-form input {
+  height: 50px;
+  min-height: 50px;
+}
+
+.forgot-password {
+  align-self: flex-end;
+  margin-top: -4px;
+}
+
+.login-submit {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 4px;
+}
+
+.login-submit svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+  transition: transform 0.2s ease;
+}
+
+.login-submit:hover svg {
+  transform: translateX(2px);
+}
+
+.startup-feedback {
+  margin-top: 18px;
+  color: var(--danger);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (min-width: 769px) and (max-width: 1760px) {
+  .sidebar .brand-row {
+    align-self: center;
+  }
+
+  .sidebar .brand-copy {
+    display: none;
+  }
+}
+
+@media (max-height: 760px) {
+  .login-card {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+
+  .auth-card__heading {
+    margin-bottom: 20px;
+  }
+
+  .login-form {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    align-items: center;
+  }
+
+  .sidebar .brand-row {
+    align-self: center;
+  }
+
+  .brand-copy,
+  .sidebar-note__detail,
+  .sidebar-footer > span:last-child {
+    display: none;
+  }
+
+  .sidebar-note {
+    align-items: center;
+    padding: 0;
+  }
+
+  .sidebar-note p {
+    font-size: 0.72rem;
+    text-align: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    min-width: 58px;
+    padding: 12px 6px;
+  }
+
+  .hero-header {
+    min-height: 58px;
+    padding: 10px 12px;
+  }
+
+  .hero-header__eyebrow {
+    font-size: 0.57rem;
+  }
+
+  .hero-header__title {
+    font-size: 0.88rem;
+  }
+
+  .hero-header__context {
+    padding: 6px 8px;
+    font-size: 0.6rem;
+  }
+
+  .hero-content {
+    padding: 14px 12px;
+  }
+
+  .login-card {
+    padding: 28px 18px;
+  }
+
+  .login-card h1 {
+    font-size: 1.7rem;
+  }
+
+  .login-form input {
+    min-height: 44px;
+    font-size: 0.88rem;
+  }
+}
