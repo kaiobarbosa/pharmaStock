@@ -3,3 +3,4 @@ Flask-Cors
 bcrypt
 mysql-connector-python
 python-dotenv
+PyJWT>=2.10,<3

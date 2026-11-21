@@ -11,6 +11,14 @@ class DirectorRepositoryError(Exception):
     """Raised when a director record cannot be stored."""
 
 
+class DirectorAlreadyConfigured(Exception):
+    """Raised when the initial director account has already been created."""
+
+
+class DirectorSetupLockUnavailable(DirectorRepositoryError):
+    """Raised when another initial setup operation holds the database lock."""
+
+
 def create_new_director(
     id_usuario,
     nome,
@@ -30,10 +38,23 @@ def create_new_director(
     connection = conectar_banco()
 
     try:
-
-       
         cursor = connection.cursor()
         try:
+            cursor.execute(
+                "SELECT GET_LOCK(%s, %s)",
+                ("pharmastock_initial_director_setup", 5),
+            )
+            lock_result = cursor.fetchone()
+            if not lock_result or lock_result[0] != 1:
+                raise DirectorSetupLockUnavailable
+
+            cursor.execute(
+                "SELECT 1 FROM usuario WHERE LOWER(tipo_usuario) = %s LIMIT 1",
+                ("diretor",),
+            )
+            if cursor.fetchone():
+                raise DirectorAlreadyConfigured
+
             cursor.execute(
                 """
                 SELECT 1 FROM usuario

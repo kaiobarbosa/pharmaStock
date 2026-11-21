@@ -3,6 +3,8 @@ from backend.src.login_and_create_account.infrastructure.external.password_encry
 from backend.src.login_and_create_account.infrastructure.repository.director_repository import (
     DirectorRepositoryError,
     DuplicateDirectorData,
+    DirectorAlreadyConfigured,
+    DirectorSetupLockUnavailable,
     create_new_director,
 )
 from backend.src.login_and_create_account.model.director_model import (
@@ -77,6 +79,16 @@ def use_case_create_account_director(data):
             "ok": False,
             "message": "Já existe uma conta com este e-mail, CPF ou código interno.",
         }, 409
+    except DirectorAlreadyConfigured:
+        return {
+            "ok": False,
+            "message": "A configuração inicial já foi concluída.",
+        }, 409
+    except DirectorSetupLockUnavailable:
+        return {
+            "ok": False,
+            "message": "A configuração inicial está em andamento. Tente novamente.",
+        }, 503
     except DatabaseUnavailable:
         return {
             "ok": False,
