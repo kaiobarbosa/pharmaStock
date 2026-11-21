@@ -66,3 +66,17 @@ window.addEventListener('focus', enforceSessionExpiration);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') enforceSessionExpiration();
 });
+
+const productSearchForm = document.querySelector('#product-search-form');
+const productSearchInput = document.querySelector('#product-search-input');
+const productSearchFeedback = document.querySelector('#product-search-feedback');
+
+productSearchForm?.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const query = productSearchInput.value.trim();
+
+  productSearchFeedback.textContent = query
+    ? 'A busca será conectada ao catálogo de produtos.'
+    : 'Digite o nome ou código de um produto para pesquisar.';
+  productSearchFeedback.hidden = false;
+});

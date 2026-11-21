@@ -6,30 +6,19 @@
     <meta name="theme-color" content="#10110f" />
     <title>PharmaStock | Cadastro do diretor</title>
     <link rel="stylesheet" href="../style/padronization.css" />
+    <link rel="stylesheet" href="../style/sidebar.css" />
     <link rel="stylesheet" href="../style/create_account_screen.css" />
   </head>
   <body>
     <div class="app-shell">
-      <aside class="sidebar" aria-label="Identidade do PharmaStock">
-        <div class="brand-row">
-          <span class="brand-mark" aria-hidden="true">P</span>
-          <span class="brand-copy">
-            <span class="brand-kicker">gestão farmacêutica</span>
-            <span class="brand-name">PharmaStock</span>
-          </span>
-        </div>
-
-        <div class="sidebar-note">
-          <span class="sidebar-note__rule" aria-hidden="true"></span>
-          <p>Primeiro acesso</p>
-          <span class="sidebar-note__detail">Cadastro da diretoria</span>
-        </div>
-
-        <div class="sidebar-footer">
-          <span class="status-dot" aria-hidden="true"></span>
-          <span>Acesso restrito</span>
-        </div>
-      </aside>
+      <aside
+        class="sidebar"
+        data-sidebar
+        data-sidebar-mode="auth"
+        data-note-title="Primeiro acesso"
+        data-note-detail="Cadastro da diretoria"
+        data-footer="Acesso restrito"
+      ></aside>
 
       <main class="hero-section">
         <header class="hero-header">
@@ -178,6 +167,7 @@
         </section>
       </main>
     </div>
+    <script src="../components/sidebar.js" defer></script>
     <script src="../js/create_account_screen.js" defer></script>
   </body>
 </html>

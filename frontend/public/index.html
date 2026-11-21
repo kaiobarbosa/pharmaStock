@@ -6,30 +6,19 @@
     <meta name="theme-color" content="#10110f" />
     <title>PharmaStock | Login</title>
     <link rel="stylesheet" href="../src/style/padronization.css" />
+    <link rel="stylesheet" href="../src/style/sidebar.css" />
     <link rel="stylesheet" href="../src/style/index.css" />
   </head>
   <body>
     <div class="app-shell">
-      <aside class="sidebar" aria-label="Identidade do PharmaStock">
-        <div class="brand-row">
-          <span class="brand-mark" aria-hidden="true">P</span>
-          <span class="brand-copy">
-            <span class="brand-kicker">gestão farmacêutica</span>
-            <span class="brand-name">PharmaStock</span>
-          </span>
-        </div>
-
-        <div class="sidebar-note">
-          <span class="sidebar-note__rule" aria-hidden="true"></span>
-          <p>Acesso seguro</p>
-          <span class="sidebar-note__detail">Gestão unificada da rede</span>
-        </div>
-
-        <div class="sidebar-footer">
-          <span class="status-dot" aria-hidden="true"></span>
-          <span>Ambiente corporativo</span>
-        </div>
-      </aside>
+      <aside
+        class="sidebar"
+        data-sidebar
+        data-sidebar-mode="auth"
+        data-note-title="Acesso seguro"
+        data-note-detail="Gestão unificada da rede"
+        data-footer="Ambiente corporativo"
+      ></aside>
 
       <main class="hero-section">
         <header class="hero-header">
@@ -107,6 +96,7 @@
         </section>
       </main>
     </div>
+    <script src="../src/components/sidebar.js" defer></script>
     <script src="../src/js/index.js" defer></script>
   </body>
 </html>
