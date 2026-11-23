@@ -91,6 +91,7 @@ function openEditBranchForm(branch) {
   editingBranchId = branch.id;
   branchForm.reset();
   branchForm.elements.id.value = branch.id;
+  branchForm.elements.name.value = branch.name;
   branchForm.elements.cep.value = branch.cep;
   branchForm.elements.street.value = branch.street;
   branchForm.elements.number.value = branch.number;
@@ -157,6 +158,7 @@ branchForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const values = Object.fromEntries(new FormData(branchForm).entries());
   const address = {
+    name: values.name.trim(),
     cep: values.cep.trim(),
     street: values.street.trim(),
     number: values.number.trim(),
@@ -176,7 +178,6 @@ branchForm.addEventListener('submit', (event) => {
     const branch = {
       ...address,
       id: `FIL-${String(nextBranchNumber).padStart(3, '0')}`,
-      name: `Filial ${address.neighborhood}`,
     };
     nextBranchNumber += 1;
     branches.unshift(branch);
