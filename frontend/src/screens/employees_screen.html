@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10110f" />
+    <title>PharmaStock | Funcionários</title>
+    <link rel="stylesheet" href="../style/padronization.css" />
+    <link rel="stylesheet" href="../style/sidebar.css" />
+    <link rel="stylesheet" href="../style/employees_screen.css" />
+  </head>
+  <body>
+    <div class="app-shell app-shell--app">
+      <aside class="sidebar" data-sidebar data-sidebar-mode="app" data-active="employees"></aside>
+      <main class="hero-section employees-main">
+        <header class="hero-header">
+          <div>
+            <p class="hero-header__eyebrow">PharmaStock</p>
+            <p class="hero-header__title">Gestão de equipe</p>
+          </div>
+          <span class="hero-header__context">Funcionários</span>
+        </header>
+
+        <div class="hero-content employees-content">
+          <div class="employees-page">
+            <p class="page-feedback" id="employee-page-feedback" role="status" aria-live="polite" hidden></p>
+            <section class="employees-upper" aria-labelledby="employees-title">
+              <div class="screen-heading">
+                <div>
+                  <p class="section-kicker">Equipe da rede</p>
+                  <h1 id="employees-title">Funcionários</h1>
+                  <p>Cadastre e gerencie os acessos da equipe.</p>
+                </div>
+                <span class="demo-badge">Dados demonstrativos</span>
+              </div>
+
+              <article class="employee-create-card" id="employee-create-card">
+                <div class="employee-create-card__intro">
+                  <span class="action-card__icon" aria-hidden="true">＋</span>
+                  <div>
+                    <h2>Novo funcionário</h2>
+                    <p>Selecione o cargo para abrir o formulário de cadastro.</p>
+                  </div>
+                </div>
+                <button class="primary-button" id="open-employee-form" type="button">Cadastrar novo funcionário</button>
+              </article>
+
+              <section class="employee-form-panel" id="employee-form-panel" aria-labelledby="employee-form-title" hidden>
+                <div class="panel-heading">
+                  <div>
+                    <p class="section-kicker" id="employee-form-kicker">Novo acesso</p>
+                    <h2 id="employee-form-title">Cadastrar funcionário</h2>
+                  </div>
+                  <button class="icon-button" id="close-employee-form" type="button" aria-label="Fechar formulário">×</button>
+                </div>
+                <form id="employee-form" class="standard-form">
+                  <div class="form-grid">
+                    <div class="field field--wide">
+                      <label for="employee-role">Cargo</label>
+                      <select id="employee-role" name="role" required>
+                        <option value="director">Diretor</option>
+                        <option value="manager">Gerente</option>
+                        <option value="pharmacist">Farmacêutico</option>
+                        <option value="attendant">Atendente</option>
+                      </select>
+                    </div>
+                    <div class="field"><label for="employee-first-name">Nome</label><input id="employee-first-name" name="firstName" required /></div>
+                    <div class="field"><label for="employee-last-name">Sobrenome</label><input id="employee-last-name" name="lastName" required /></div>
+                    <div class="field"><label for="employee-code">Código interno</label><input id="employee-code" name="internalCode" required /></div>
+                    <div class="field" id="employee-branch-field"><label for="employee-branch">Filial</label><select id="employee-branch" name="branch"><option value="Filial Centro">Filial Centro</option><option value="Filial Jardins">Filial Jardins</option><option value="Filial Norte">Filial Norte</option></select></div>
+                    <div class="field" id="employee-crf-field" hidden><label for="employee-crf">CRF</label><input id="employee-crf" name="crf" placeholder="Ex.: CRF-SP 123456" /></div>
+                    <div class="field"><label for="employee-email">E-mail</label><input id="employee-email" name="email" type="email" autocomplete="email" required /></div>
+                    <div class="field"><label for="employee-password">Senha</label><input id="employee-password" name="password" type="password" autocomplete="new-password" /></div>
+                  </div>
+                  <div class="form-actions">
+                    <p class="form-feedback" id="employee-form-feedback" role="status" aria-live="polite" hidden></p>
+                    <button class="text-button text-button--danger" id="inactivate-employee-from-form" type="button" hidden>Inativar acesso</button>
+                    <button class="secondary-button" id="cancel-employee-form" type="button">Cancelar</button>
+                    <button class="primary-button" id="save-employee" type="submit">Cadastrar funcionário</button>
+                  </div>
+                </form>
+              </section>
+            </section>
+
+            <section class="employees-lower" aria-labelledby="employee-list-title">
+              <div class="list-heading">
+                <div>
+                  <p class="section-kicker">Acessos da rede</p>
+                  <h2 id="employee-list-title">Funcionários cadastrados</h2>
+                </div>
+                <span class="list-count" id="employee-count"></span>
+              </div>
+              <div class="employee-list" id="employee-list"></div>
+              <p class="empty-state" id="employee-empty" hidden>Nenhum funcionário encontrado.</p>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <dialog class="confirm-dialog" id="employee-confirm-dialog" aria-labelledby="employee-confirm-title">
+      <p class="section-kicker">Confirmação</p>
+      <h2 id="employee-confirm-title">Inativar funcionário?</h2>
+      <p id="employee-confirm-message">O acesso ficará marcado como inativo neste protótipo.</p>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="employee-confirm-cancel" type="button">Cancelar</button>
+        <button class="danger-button" id="employee-confirm-accept" type="button">Inativar</button>
+      </div>
+    </dialog>
+    <script src="../components/sidebar.js" defer></script>
+    <script src="../js/employee_screen.js" defer></script>
+  </body>
+</html>

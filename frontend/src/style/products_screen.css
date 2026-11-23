@@ -1,0 +1,238 @@
+.products-main {
+  min-width: 0;
+  min-height: 0;
+}
+
+.products-content {
+  padding: clamp(20px, 2.7vw, 34px);
+}
+
+.products-page {
+  display: flex;
+  width: min(100%, 1360px);
+  min-height: 100%;
+  flex-direction: column;
+  gap: 23px;
+  margin: 0 auto;
+}
+
+.product-view:not([hidden]) {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.screen-heading--compact h1 {
+  font-size: clamp(1.4rem, 2vw, 1.75rem);
+}
+
+.screen-heading--compact > .text-button {
+  flex: 0 0 auto;
+}
+
+.product-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.product-action-card {
+  display: flex;
+  min-height: 275px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(23px, 3vw, 32px);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  background-color: var(--surface-700);
+  box-shadow: 0 12px 28px var(--shadow);
+}
+
+.product-action-card--primary {
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(124, 154, 128, 0.11), transparent 48%),
+    var(--surface-700);
+}
+
+.product-action-card h2 {
+  font-size: 1.45rem;
+  font-weight: 400;
+}
+
+.product-action-card > div > p:last-child {
+  max-width: 460px;
+  margin-top: 8px;
+  color: var(--text-300);
+  font-size: 0.87rem;
+  line-height: 1.55;
+}
+
+.product-action-card .primary-button,
+.product-action-card .secondary-button {
+  margin-top: auto;
+}
+
+.product-editor-form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.product-editor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.product-editor-panel {
+  padding: 23px clamp(18px, 2.5vw, 30px);
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  background-color: var(--surface-700);
+}
+
+.product-editor-panel .panel-heading {
+  margin-bottom: 18px;
+}
+
+.product-editor-panel .panel-heading h2 {
+  font-size: 1.25rem;
+}
+
+.product-specific-panel {
+  min-height: 142px;
+}
+
+.product-specific-panel .form-grid {
+  row-gap: 12px;
+}
+
+.panel-hint {
+  color: var(--text-300);
+  font-size: 0.84rem;
+}
+
+.product-editor-form .form-actions {
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+.inventory-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(170px, 250px) auto;
+  align-items: end;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--border-soft);
+  border-radius: 13px;
+  background-color: var(--surface-700);
+}
+
+.inventory-filters .primary-button {
+  min-width: 120px;
+}
+
+.inventory-results-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.inventory-results-heading h2 {
+  font-size: 1.22rem;
+  font-weight: 400;
+}
+
+.inventory-table {
+  min-width: 630px;
+}
+
+.product-id {
+  color: var(--accent-400);
+  font-family: var(--font-ui);
+  font-size: 0.76rem;
+}
+
+.inventory-product-name {
+  display: block;
+  color: var(--text-100);
+}
+
+.inventory-product-name + small {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-300);
+  font-size: 0.72rem;
+}
+
+.quantity-pill {
+  display: inline-flex;
+  min-width: 38px;
+  justify-content: center;
+  padding: 5px 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  color: var(--text-100);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .products-content {
+    padding: 22px 20px;
+  }
+
+  .product-overview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .product-action-card {
+    min-height: 235px;
+  }
+
+  .inventory-filters {
+    grid-template-columns: minmax(0, 1fr) minmax(140px, 0.7fr);
+  }
+
+  .inventory-filters .primary-button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .products-content {
+    padding: 17px 12px;
+  }
+
+  .products-page {
+    gap: 18px;
+  }
+
+  .product-view:not([hidden]) {
+    gap: 20px;
+  }
+
+  .screen-heading {
+    flex-wrap: wrap;
+  }
+
+  .product-action-card {
+    min-height: 225px;
+    padding: 22px;
+  }
+
+  .product-editor-panel {
+    padding: 19px 15px;
+  }
+
+  .inventory-filters {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 15px;
+  }
+
+  .inventory-filters .primary-button {
+    grid-column: auto;
+  }
+}

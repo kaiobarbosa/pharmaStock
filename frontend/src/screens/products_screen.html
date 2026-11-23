@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10110f" />
+    <title>PharmaStock | Produtos</title>
+    <link rel="stylesheet" href="../style/padronization.css" />
+    <link rel="stylesheet" href="../style/sidebar.css" />
+    <link rel="stylesheet" href="../style/products_screen.css" />
+  </head>
+  <body>
+    <div class="app-shell app-shell--app">
+      <aside class="sidebar" data-sidebar data-sidebar-mode="app" data-active="products"></aside>
+      <main class="hero-section products-main">
+        <header class="hero-header">
+          <div>
+            <p class="hero-header__eyebrow">PharmaStock</p>
+            <p class="hero-header__title">Produtos e estoque</p>
+          </div>
+          <span class="hero-header__context">Catálogo</span>
+        </header>
+
+        <div class="hero-content products-content">
+          <div class="products-page">
+            <p class="page-feedback" id="products-feedback" role="status" aria-live="polite" hidden></p>
+            <section class="product-view" data-product-view="overview" aria-labelledby="products-title">
+              <div class="screen-heading">
+                <div>
+                  <p class="section-kicker">Gestão de produtos</p>
+                  <h1 id="products-title">Produtos e estoque</h1>
+                  <p>Cadastre produtos e consulte os itens disponíveis nas filiais.</p>
+                </div>
+                <span class="demo-badge">Dados demonstrativos</span>
+              </div>
+
+              <div class="product-overview-grid">
+                <article class="product-action-card product-action-card--primary">
+                  <span class="action-card__icon" aria-hidden="true">＋</span>
+                  <div>
+                    <p class="section-kicker">Cadastro</p>
+                    <h2>Adicionar produto</h2>
+                    <p>Inclua os dados do produto e os detalhes específicos da categoria.</p>
+                  </div>
+                  <button class="primary-button" id="start-product-create" type="button">Cadastrar novo produto</button>
+                </article>
+
+                <article class="product-action-card">
+                  <span class="action-card__icon action-card__icon--muted" aria-hidden="true">▦</span>
+                  <div>
+                    <p class="section-kicker">Consulta</p>
+                    <h2>Acessar estoque</h2>
+                    <p>Pesquise os produtos pelo nome, código de barras ou filial.</p>
+                  </div>
+                  <button class="secondary-button" id="open-inventory" type="button">Ver estoque</button>
+                </article>
+              </div>
+            </section>
+
+            <section class="product-view" data-product-view="create" aria-labelledby="product-form-title" hidden>
+              <div class="screen-heading screen-heading--compact">
+                <div>
+                  <p class="section-kicker">Novo cadastro</p>
+                  <h1 id="product-form-title">Cadastrar produto</h1>
+                  <p>Os campos adicionais mudam conforme o tipo escolhido.</p>
+                </div>
+                <button class="text-button" type="button" data-product-view-open="overview">Voltar</button>
+              </div>
+
+              <form id="product-form" class="product-editor-form">
+                <div class="product-editor-grid">
+                  <section class="product-editor-panel" aria-labelledby="product-general-title">
+                    <div class="panel-heading">
+                      <div>
+                        <p class="section-kicker">Informações principais</p>
+                        <h2 id="product-general-title">Dados gerais</h2>
+                      </div>
+                    </div>
+                    <div class="form-grid">
+                      <div class="field field--wide">
+                        <label for="product-type">Tipo de produto</label>
+                        <select id="product-type" name="type" required>
+                          <option value="general">Geral</option>
+                          <option value="dermocosmetic">Dermocosméticos</option>
+                          <option value="medicine">Medicamentos</option>
+                          <option value="equipment">Equipamentos</option>
+                        </select>
+                      </div>
+                      <div class="field"><label for="product-name">Nome</label><input id="product-name" name="name" required /></div>
+                      <div class="field"><label for="product-brand">Marca</label><input id="product-brand" name="brand" required /></div>
+                      <div class="field field--wide"><label for="product-description">Descrição</label><textarea id="product-description" name="description" rows="2" required></textarea></div>
+                      <div class="field"><label for="product-price">Preço (R$)</label><input id="product-price" name="price" type="number" min="0" step="0.01" placeholder="0,00" required /></div>
+                      <div class="field"><label for="product-barcode">Código de barras</label><input id="product-barcode" name="barcode" inputmode="numeric" required /></div>
+                      <div class="field"><label for="product-quantity">Quantidade</label><input id="product-quantity" name="quantity" type="number" min="0" step="1" required /></div>
+                      <div class="field"><label for="product-branch">Filial</label><select id="product-branch" name="branch" required><option value="Filial Centro">Filial Centro</option><option value="Filial Jardins">Filial Jardins</option><option value="Filial Norte">Filial Norte</option></select></div>
+                    </div>
+                  </section>
+
+                  <section class="product-editor-panel product-specific-panel" aria-labelledby="product-specific-title">
+                    <div class="panel-heading">
+                      <div>
+                        <p class="section-kicker">Por categoria</p>
+                        <h2 id="product-specific-title">Informações adicionais</h2>
+                      </div>
+                    </div>
+                    <div class="form-grid" id="product-specific-fields"></div>
+                    <p class="panel-hint" id="product-specific-hint">Produtos gerais não precisam de campos adicionais.</p>
+                  </section>
+                </div>
+                <div class="form-actions">
+                  <p class="form-feedback" id="product-form-feedback" role="status" aria-live="polite" hidden></p>
+                  <button class="secondary-button" type="button" data-product-view-open="overview">Cancelar</button>
+                  <button class="primary-button" type="submit">Cadastrar produto</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="product-view" data-product-view="stock" aria-labelledby="inventory-title" hidden>
+              <div class="screen-heading screen-heading--compact">
+                <div>
+                  <p class="section-kicker">Consulta de estoque</p>
+                  <h1 id="inventory-title">Estoque de produtos</h1>
+                  <p>Consulte os itens do catálogo por nome ou código de barras.</p>
+                </div>
+                <button class="text-button" type="button" data-product-view-open="overview">Voltar</button>
+              </div>
+
+              <form class="inventory-filters" id="inventory-filter-form">
+                <div class="field inventory-search-field">
+                  <label for="inventory-query">Produto</label>
+                  <input id="inventory-query" name="query" type="search" placeholder="Nome ou código de barras" />
+                </div>
+                <div class="field inventory-branch-field">
+                  <label for="inventory-branch">Filial</label>
+                  <select id="inventory-branch" name="branch">
+                    <option value="all">Geral</option>
+                    <option value="Filial Centro">Filial Centro</option>
+                    <option value="Filial Jardins">Filial Jardins</option>
+                    <option value="Filial Norte">Filial Norte</option>
+                  </select>
+                </div>
+                <button class="primary-button" type="submit">Pesquisar</button>
+              </form>
+
+              <div class="inventory-results-heading">
+                <h2>Produtos cadastrados</h2>
+                <span id="inventory-result-count" class="result-count"></span>
+              </div>
+              <div class="data-table-wrap">
+                <table class="data-table inventory-table">
+                  <thead><tr><th scope="col">ID do produto</th><th scope="col">Nome</th><th scope="col">Quantidade</th><th scope="col">Código de barras</th></tr></thead>
+                  <tbody id="inventory-list"></tbody>
+                </table>
+              </div>
+              <p class="empty-state" id="inventory-empty" hidden>Nenhum produto corresponde aos filtros selecionados.</p>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="../components/sidebar.js" defer></script>
+    <script src="../js/products_screen.js" defer></script>
+  </body>
+</html>

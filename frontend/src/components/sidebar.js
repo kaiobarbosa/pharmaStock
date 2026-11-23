@@ -20,7 +20,7 @@
     { id: 'home', label: 'Home', file: 'home_screen.html' },
     { id: 'products', label: 'Produtos', file: 'products_screen.html' },
     { id: 'employees', label: 'Funcionários', file: 'employees_screen.html' },
-    { id: 'branches', label: 'Filiais', file: 'branches_screen.html' },
+    { id: 'branches', label: 'Filiais', file: 'branchs_screen.html' },
     { id: 'profile', label: 'Perfil', file: 'profile_screen.html' },
   ];
 
