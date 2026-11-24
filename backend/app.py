@@ -17,6 +17,12 @@ from backend.src.branchs.presentation.new_branch_presentation import (
 from backend.src.branchs.presentation.edit_branch_presentation import (
     blueprint_edit_branch,
 )
+from backend.src.employees.presentation.create_new_employee_presentation import (
+    blueprint_create_employee,
+)
+from backend.src.employees.presentation.select_all_employee_presentation import (
+    blueprint_select_all_employees,
+)
 
 load_dotenv()
 
@@ -33,6 +39,8 @@ app.register_blueprint(blueprint_check_director_exists)
 app.register_blueprint(blueprint_login)
 app.register_blueprint(blueprint_create_branch)
 app.register_blueprint(blueprint_edit_branch)
+app.register_blueprint(blueprint_create_employee)
+app.register_blueprint(blueprint_select_all_employees)
 
 @app.get("/health")
 def health():
