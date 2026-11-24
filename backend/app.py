@@ -11,6 +11,12 @@ from backend.src.login_and_create_account.presentation.verify_director_exist_pre
     blueprint_check_director_exists,)   
 from backend.src.login_and_create_account.presentation.login_presentation import (
     blueprint_login,)
+from backend.src.branchs.presentation.new_branch_presentation import (
+    blueprint_create_branch,
+)
+from backend.src.branchs.presentation.edit_branch_presentation import (
+    blueprint_edit_branch,
+)
 
 load_dotenv()
 
@@ -25,6 +31,8 @@ CORS(app, resources={r"/*": {"origins": ["null", "file://"]}})
 app.register_blueprint(blueprint_create_director_account)
 app.register_blueprint(blueprint_check_director_exists)
 app.register_blueprint(blueprint_login)
+app.register_blueprint(blueprint_create_branch)
+app.register_blueprint(blueprint_edit_branch)
 
 @app.get("/health")
 def health():

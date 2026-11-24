@@ -1,8 +1,4 @@
-const branches = [
-  { id: 'FIL-001', name: 'Filial Centro', cep: '01001-000', street: 'Praça da Sé', number: '120', complement: 'Loja 02', neighborhood: 'Sé', city: 'São Paulo', state: 'SP', active: true },
-  { id: 'FIL-002', name: 'Filial Jardins', cep: '01415-001', street: 'Rua Augusta', number: '845', complement: '', neighborhood: 'Cerqueira César', city: 'São Paulo', state: 'SP', active: true },
-  { id: 'FIL-003', name: 'Filial Norte', cep: '02011-000', street: 'Rua Voluntários da Pátria', number: '2100', complement: 'Térreo', neighborhood: 'Santana', city: 'São Paulo', state: 'SP', active: true },
-];
+const branches = [];
 
 const branchList = document.querySelector('#branch-list');
 const branchCount = document.querySelector('#branch-count');
@@ -13,11 +9,20 @@ const branchCreateCard = document.querySelector('#branch-create-card');
 const branchPageFeedback = document.querySelector('#branch-page-feedback');
 const branchDialog = document.querySelector('#branch-confirm-dialog');
 const branchIdDisplayField = document.querySelector('#branch-id-display-field');
+const branchFormFeedback = document.querySelector('#branch-form-feedback');
+const saveBranchButton = document.querySelector('#save-branch');
+const retryBranchesButton = document.querySelector('#retry-branches');
+const branchesSourceBadge = document.querySelector('#branches-source-badge');
+
+const API_PORT = window.desktopEnv?.apiPort || '5055';
+const BRANCHES_API_URL = `http://127.0.0.1:${API_PORT}/api/branches`;
+const CREATE_BRANCH_URL = `http://127.0.0.1:${API_PORT}/api/create_branch`;
 
 let activeBranchId = null;
 let editingBranchId = null;
 let pendingInactiveBranchId = null;
-let nextBranchNumber = branches.length + 1;
+let branchesLoadState = 'loading';
+let branchesLoadRequest = 0;
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -28,6 +33,27 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function mapBranch(branchData) {
+  return {
+    id: String(branchData.id_filial),
+    addressId: String(branchData.id_endereco),
+    name: branchData.nome_filial,
+    cep: branchData.cep,
+    street: branchData.logradouro,
+    number: String(branchData.numero),
+    complement: branchData.complemento || '',
+    neighborhood: branchData.bairro,
+    city: branchData.cidade,
+    state: branchData.estado,
+    active: true,
+  };
+}
+
+function formatCep(cep) {
+  const digits = String(cep ?? '').replace(/\D/g, '');
+  return digits.length === 8 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : cep;
+}
+
 function addressSummary(branch) {
   const complement = branch.complement ? ` · ${branch.complement}` : '';
   return `${branch.street}, ${branch.number}${complement} · ${branch.neighborhood} · ${branch.city}/${branch.state}`;
@@ -35,8 +61,21 @@ function addressSummary(branch) {
 
 function renderBranches() {
   const activeCount = branches.filter((branch) => branch.active).length;
-  branchCount.textContent = `${activeCount} ativas · ${branches.length} no total`;
+  branchCount.textContent = branchesLoadState === 'loading'
+    ? 'Carregando...'
+    : branchesLoadState === 'error'
+      ? 'Indisponível'
+      : `${activeCount} ${activeCount === 1 ? 'ativa' : 'ativas'} · ${branches.length} no total`;
   branchEmpty.hidden = branches.length > 0;
+  retryBranchesButton.hidden = branchesLoadState !== 'error';
+
+  if (branches.length === 0) {
+    branchEmpty.textContent = branchesLoadState === 'loading'
+      ? 'Carregando filiais...'
+      : branchesLoadState === 'error'
+        ? 'Não foi possível obter a lista de filiais.'
+        : 'Nenhuma filial cadastrada.';
+  }
 
   branchList.innerHTML = branches.map((branch) => {
     const expanded = activeBranchId === branch.id;
@@ -48,7 +87,7 @@ function renderBranches() {
             <strong>${escapeHtml(branch.name)}</strong>
             <span>${escapeHtml(addressSummary(branch))}</span>
           </span>
-          <span class="branch-card__cep">CEP ${escapeHtml(branch.cep)}</span>
+          <span class="branch-card__cep">CEP ${escapeHtml(formatCep(branch.cep))}</span>
           <span class="status-badge ${branch.active ? 'is-active' : 'is-inactive'}">${branch.active ? 'Ativa' : 'Inativa'}</span>
           <span class="branch-card__chevron" aria-hidden="true">${expanded ? '−' : '+'}</span>
         </button>
@@ -56,7 +95,7 @@ function renderBranches() {
           <div class="branch-card__actions">
             <span class="branch-card__code">ID ${escapeHtml(branch.id)}</span>
             <div>
-              <button class="text-button" type="button" data-branch-edit="${escapeHtml(branch.id)}">Editar endereço</button>
+              <button class="text-button" type="button" data-branch-edit="${escapeHtml(branch.id)}">Editar filial</button>
               ${branch.active
                 ? `<button class="text-button text-button--danger" type="button" data-branch-inactivate="${escapeHtml(branch.id)}">Inativar filial</button>`
                 : `<button class="text-button" type="button" data-branch-reactivate="${escapeHtml(branch.id)}">Reativar filial</button>`}
@@ -66,12 +105,93 @@ function renderBranches() {
   }).join('');
 }
 
+function showBranchFormError(message) {
+  branchFormFeedback.textContent = message;
+  branchFormFeedback.dataset.kind = 'error';
+  branchFormFeedback.hidden = false;
+}
+
+function branchPayload(address) {
+  return {
+    nome: address.name,
+    cep: address.cep,
+    logradouro: address.street,
+    numero: address.number,
+    complemento: address.complement,
+    bairro: address.neighborhood,
+    cidade: address.city,
+    estado: address.state,
+  };
+}
+
+async function sendBranchRequest(url, method, address) {
+  let response;
+  try {
+    response = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(branchPayload(address)),
+    });
+  } catch (error) {
+    throw new Error('Não foi possível conectar ao servidor. Confira se o backend Flask está em execução.');
+  }
+
+  let result;
+  try {
+    result = await response.json();
+  } catch (error) {
+    throw new Error('O servidor retornou uma resposta inválida. Tente novamente.');
+  }
+
+  if (!response.ok || !result.ok) {
+    const details = result.errors ? Object.values(result.errors).join(' ') : '';
+    throw new Error([result.message, details].filter(Boolean).join(' ') || 'Não foi possível salvar a filial.');
+  }
+  if (!result.branch?.id_filial || !result.branch?.id_endereco) {
+    throw new Error('O servidor não retornou os identificadores da filial e do endereço.');
+  }
+  return result;
+}
+
+async function loadBranches() {
+  const requestNumber = ++branchesLoadRequest;
+  branchesLoadState = 'loading';
+  branchesSourceBadge.textContent = 'Carregando do banco';
+  branchPageFeedback.hidden = true;
+  renderBranches();
+
+  try {
+    const response = await fetch(BRANCHES_API_URL);
+    const result = await response.json();
+    if (!response.ok || !result.ok || !Array.isArray(result.branches)) {
+      throw new Error(result.message || 'Não foi possível carregar as filiais.');
+    }
+    if (requestNumber !== branchesLoadRequest) return;
+
+    branches.splice(0, branches.length, ...result.branches.map(mapBranch));
+    branchesLoadState = 'ready';
+    branchesSourceBadge.textContent = 'Dados do banco';
+    renderBranches();
+  } catch (error) {
+    if (requestNumber !== branchesLoadRequest) return;
+    branchesLoadState = 'error';
+    branchesSourceBadge.textContent = 'Banco indisponível';
+    branchPageFeedback.textContent = error.message || 'Não foi possível carregar as filiais.';
+    branchPageFeedback.dataset.kind = 'error';
+    branchPageFeedback.hidden = false;
+    renderBranches();
+  }
+}
+
 function closeBranchForm() {
   branchFormPanel.hidden = true;
   branchCreateCard.hidden = false;
   branchForm.reset();
   editingBranchId = null;
   branchIdDisplayField.hidden = true;
+  branchFormFeedback.hidden = true;
+  branchFormFeedback.textContent = '';
+  delete branchFormFeedback.dataset.kind;
 }
 
 function openNewBranchForm() {
@@ -81,7 +201,9 @@ function openNewBranchForm() {
   branchIdDisplayField.hidden = true;
   document.querySelector('#branch-form-kicker').textContent = 'Novo endereço';
   document.querySelector('#branch-form-title').textContent = 'Cadastrar filial';
-  document.querySelector('#save-branch').textContent = 'Cadastrar filial';
+  saveBranchButton.textContent = 'Cadastrar filial';
+  branchFormFeedback.hidden = true;
+  branchFormFeedback.textContent = '';
   branchCreateCard.hidden = true;
   branchFormPanel.hidden = false;
   document.querySelector('#branch-cep').focus();
@@ -92,7 +214,7 @@ function openEditBranchForm(branch) {
   branchForm.reset();
   branchForm.elements.id.value = branch.id;
   branchForm.elements.name.value = branch.name;
-  branchForm.elements.cep.value = branch.cep;
+  branchForm.elements.cep.value = formatCep(branch.cep);
   branchForm.elements.street.value = branch.street;
   branchForm.elements.number.value = branch.number;
   branchForm.elements.complement.value = branch.complement;
@@ -101,9 +223,11 @@ function openEditBranchForm(branch) {
   branchForm.elements.state.value = branch.state;
   document.querySelector('#branch-id-display').value = branch.id;
   branchIdDisplayField.hidden = false;
-  document.querySelector('#branch-form-kicker').textContent = 'Editar endereço';
+  document.querySelector('#branch-form-kicker').textContent = 'Editar filial';
   document.querySelector('#branch-form-title').textContent = `Editar ${branch.name}`;
-  document.querySelector('#save-branch').textContent = 'Salvar alterações';
+  saveBranchButton.textContent = 'Salvar alterações';
+  branchFormFeedback.hidden = true;
+  branchFormFeedback.textContent = '';
   branchCreateCard.hidden = true;
   branchFormPanel.hidden = false;
   branchFormPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -113,6 +237,7 @@ function openEditBranchForm(branch) {
 document.querySelector('#open-branch-form').addEventListener('click', openNewBranchForm);
 document.querySelector('#close-branch-form').addEventListener('click', closeBranchForm);
 document.querySelector('#cancel-branch-form').addEventListener('click', closeBranchForm);
+retryBranchesButton.addEventListener('click', loadBranches);
 
 branchList.addEventListener('click', (event) => {
   const toggle = event.target.closest('[data-branch-toggle]');
@@ -154,7 +279,7 @@ branchForm.elements.cep.addEventListener('input', (event) => {
   event.target.value = digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
 });
 
-branchForm.addEventListener('submit', (event) => {
+branchForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const values = Object.fromEntries(new FormData(branchForm).entries());
   const address = {
@@ -166,28 +291,48 @@ branchForm.addEventListener('submit', (event) => {
     neighborhood: values.neighborhood.trim(),
     city: values.city.trim(),
     state: values.state,
-    active: true,
   };
+  const branchIdBeingEdited = editingBranchId;
 
-  if (editingBranchId) {
-    const branch = branches.find((item) => item.id === editingBranchId);
-    Object.assign(branch, address);
-    branchPageFeedback.textContent = `O endereço de ${branch.name} foi atualizado neste protótipo.`;
-    activeBranchId = branch.id;
-  } else {
-    const branch = {
-      ...address,
-      id: `FIL-${String(nextBranchNumber).padStart(3, '0')}`,
-    };
-    nextBranchNumber += 1;
-    branches.unshift(branch);
-    branchPageFeedback.textContent = `${branch.name} foi adicionada à lista demonstrativa.`;
-    activeBranchId = branch.id;
+  saveBranchButton.disabled = true;
+  saveBranchButton.textContent = branchIdBeingEdited ? 'Salvando...' : 'Cadastrando...';
+  branchFormFeedback.hidden = true;
+
+  try {
+    const result = branchIdBeingEdited
+      ? await sendBranchRequest(
+        `${BRANCHES_API_URL}/${encodeURIComponent(branchIdBeingEdited)}`,
+        'PUT',
+        address,
+      )
+      : await sendBranchRequest(CREATE_BRANCH_URL, 'POST', address);
+    const savedBranch = mapBranch(result.branch);
+
+    if (branchIdBeingEdited) {
+      const index = branches.findIndex((branch) => branch.id === branchIdBeingEdited);
+      if (index !== -1) {
+        savedBranch.active = branches[index].active;
+        branches.splice(index, 1, savedBranch);
+      }
+    } else {
+      branchesLoadRequest += 1;
+      branches.unshift(savedBranch);
+      branchesLoadState = 'ready';
+      branchesSourceBadge.textContent = 'Dados do banco';
+    }
+
+    activeBranchId = savedBranch.id;
+    branchPageFeedback.textContent = result.message;
+    branchPageFeedback.hidden = false;
+    branchPageFeedback.dataset.kind = 'success';
+    closeBranchForm();
+    renderBranches();
+  } catch (error) {
+    showBranchFormError(error.message);
+  } finally {
+    saveBranchButton.disabled = false;
+    saveBranchButton.textContent = editingBranchId ? 'Salvar alterações' : 'Cadastrar filial';
   }
-
-  branchPageFeedback.hidden = false;
-  closeBranchForm();
-  renderBranches();
 });
 
 document.querySelector('#branch-confirm-cancel').addEventListener('click', () => branchDialog.close());
@@ -197,6 +342,7 @@ document.querySelector('#branch-confirm-accept').addEventListener('click', () =>
     branch.active = false;
     activeBranchId = branch.id;
     branchPageFeedback.textContent = `${branch.name} foi marcada como inativa neste protótipo.`;
+    branchPageFeedback.dataset.kind = 'success';
     branchPageFeedback.hidden = false;
   }
   pendingInactiveBranchId = null;
@@ -205,3 +351,4 @@ document.querySelector('#branch-confirm-accept').addEventListener('click', () =>
 });
 
 renderBranches();
+loadBranches();

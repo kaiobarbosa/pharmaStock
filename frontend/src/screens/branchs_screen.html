@@ -31,7 +31,7 @@
                   <h1 id="branches-title">Filiais</h1>
                   <p>Cadastre endereços e mantenha os locais de atendimento atualizados.</p>
                 </div>
-                <span class="demo-badge">Dados demonstrativos</span>
+                <span class="demo-badge" id="branches-source-badge">Carregando do banco</span>
               </div>
 
               <article class="branch-create-card" id="branch-create-card">
@@ -57,13 +57,13 @@
                   <input id="branch-id" name="id" type="hidden" />
                   <div class="form-grid">
                     <div class="field field--wide" id="branch-id-display-field" hidden><label for="branch-id-display">ID da filial</label><input id="branch-id-display" type="text" readonly /></div>
-                    <div class="field field--wide"><label for="branch-name">Nome da filial</label><input id="branch-name" name="name" placeholder="Ex.: Filial Centro" autocomplete="organization" required /></div>
+                    <div class="field field--wide"><label for="branch-name">Nome da filial</label><input id="branch-name" name="name" maxlength="50" placeholder="Ex.: Filial Centro" autocomplete="organization" required /></div>
                     <div class="field"><label for="branch-cep">CEP</label><input id="branch-cep" name="cep" inputmode="numeric" placeholder="00000-000" maxlength="9" required /></div>
-                    <div class="field field--wide"><label for="branch-street">Logradouro</label><input id="branch-street" name="street" placeholder="Rua, avenida..." required /></div>
-                    <div class="field"><label for="branch-number">Número</label><input id="branch-number" name="number" required /></div>
-                    <div class="field"><label for="branch-complement">Complemento</label><input id="branch-complement" name="complement" placeholder="Sala, bloco..." /></div>
-                    <div class="field"><label for="branch-neighborhood">Bairro</label><input id="branch-neighborhood" name="neighborhood" required /></div>
-                    <div class="field"><label for="branch-city">Cidade</label><input id="branch-city" name="city" required /></div>
+                    <div class="field field--wide"><label for="branch-street">Logradouro</label><input id="branch-street" name="street" maxlength="100" placeholder="Rua, avenida..." required /></div>
+                    <div class="field"><label for="branch-number">Número</label><input id="branch-number" name="number" maxlength="10" required /></div>
+                    <div class="field"><label for="branch-complement">Complemento</label><input id="branch-complement" name="complement" maxlength="100" placeholder="Sala, bloco..." /></div>
+                    <div class="field"><label for="branch-neighborhood">Bairro</label><input id="branch-neighborhood" name="neighborhood" maxlength="100" required /></div>
+                    <div class="field"><label for="branch-city">Cidade</label><input id="branch-city" name="city" maxlength="100" required /></div>
                     <div class="field"><label for="branch-state">Estado</label><select id="branch-state" name="state" required><option value="">Selecione</option><option>AC</option><option>AL</option><option>AM</option><option>AP</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MG</option><option>MS</option><option>MT</option><option>PA</option><option>PB</option><option>PE</option><option>PI</option><option>PR</option><option>RJ</option><option>RN</option><option>RO</option><option>RR</option><option>RS</option><option>SC</option><option>SE</option><option>SP</option><option>TO</option></select></div>
                   </div>
                   <div class="form-actions">
@@ -85,6 +85,7 @@
               </div>
               <div class="branch-list" id="branch-list"></div>
               <p class="empty-state" id="branch-empty" hidden>Nenhuma filial cadastrada.</p>
+              <button class="secondary-button branches-retry" id="retry-branches" type="button" hidden>Tentar novamente</button>
             </section>
           </div>
         </div>

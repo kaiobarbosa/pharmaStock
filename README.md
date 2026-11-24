@@ -20,3 +20,5 @@ O login retorna um JWT assinado com HS256. O token leva o nome e o e-mail do usu
 `POST /api/create_director_account` recebe JSON com `first_name`, `last_name`, `cpf`, `email`, `password`, `password_confirmation` e `internal_code`. O endpoint responde JSON; uma criação bem-sucedida retorna `201 Created`.
 
 `POST /api/login` recebe `email` e `password`. No sucesso, retorna `access_token` (Bearer JWT) com as claims `nome`, `email` e `exp`; o token dura uma hora. `GET /api/auth/session` valida o token enviado no cabeçalho `Authorization: Bearer <token>`.
+
+`POST /api/create_branch` recebe JSON com `nome`, `cep`, `logradouro`, `numero`, `complemento`, `bairro`, `cidade` e `estado`. O complemento pode ser vazio. No sucesso, cria o endereço e a filial na mesma transação e retorna `201 Created` com os identificadores gerados. `GET /api/branches` retorna as filiais com seus endereços. `PUT /api/branches/<id_filial>` recebe os mesmos campos do cadastro e atualiza filial e endereço na mesma transação.

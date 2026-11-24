@@ -186,6 +186,20 @@
   margin-top: 17px;
 }
 
+.branch-form-panel .form-feedback[data-kind="error"] {
+  color: var(--danger);
+}
+
+.page-feedback[data-kind="error"] {
+  border-color: rgba(196, 116, 102, 0.3);
+  background-color: rgba(196, 116, 102, 0.1);
+  color: #e4a092;
+}
+
+.branches-retry {
+  align-self: center;
+}
+
 @media (max-width: 1024px) {
   .branch-card__summary {
     grid-template-columns: 42px minmax(180px, 1fr) auto 16px;
