@@ -116,3 +116,64 @@ def validate_new_employee_data(data):
         normalized["crf"] = "N/A"
 
     return normalized, errors
+
+
+def validate_employee_edit_data(data):
+    errors = {}
+    normalized = {}
+
+    def field(*keys):
+        for key in keys:
+            if key in data:
+                return data.get(key)
+        return None
+
+    role = normalize_employee_role(field("role", "tipo_usuario"))
+    if role is None:
+        errors["role"] = "Selecione um cargo válido."
+    else:
+        normalized["role"] = role
+
+    for key, aliases, label in (
+        ("first_name", ("first_name", "firstName"), "Nome"),
+        ("last_name", ("last_name", "lastName"), "Sobrenome"),
+        ("email", ("email",), "E-mail"),
+    ):
+        value = field(*aliases)
+        if not isinstance(value, str) or not value.strip():
+            errors[key] = f"{label} é obrigatório."
+            continue
+        normalized[key] = value.strip()
+
+    if "first_name" in normalized and len(normalized["first_name"]) > 100:
+        errors["first_name"] = "Nome deve ter no máximo 100 caracteres."
+    if "last_name" in normalized and len(normalized["last_name"]) > 100:
+        errors["last_name"] = "Sobrenome deve ter no máximo 100 caracteres."
+    if "email" in normalized:
+        normalized["email"] = normalized["email"].lower()
+        if len(normalized["email"]) > 254 or not validate_email(normalized["email"]):
+            errors["email"] = "Informe um endereço de e-mail válido."
+
+    branch_value = field("branch_id", "branchId", "branch")
+    if normalized.get("role") != "diretor":
+        if not isinstance(branch_value, str) or not branch_value.strip():
+            errors["branch_id"] = "Filial é obrigatória para este cargo."
+        elif len(branch_value.strip()) > 50:
+            errors["branch_id"] = "Selecione uma filial válida."
+        else:
+            normalized["branch_reference"] = branch_value.strip()
+
+    if normalized.get("role") == "farmaceutico":
+        crf = field("crf")
+        if crf is None or (isinstance(crf, str) and not crf.strip()):
+            normalized["crf"] = None
+        elif not isinstance(crf, str):
+            errors["crf"] = "Informe um CRF válido."
+        elif len(crf.strip()) > 20:
+            errors["crf"] = "CRF deve ter no máximo 20 caracteres."
+        else:
+            normalized["crf"] = crf.strip()
+    else:
+        normalized["crf"] = "N/A"
+
+    return normalized, errors

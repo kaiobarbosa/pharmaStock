@@ -96,11 +96,15 @@
   display: grid;
   width: 100%;
   min-height: 78px;
-  grid-template-columns: 42px minmax(190px, 1fr) minmax(160px, 0.8fr);
+  grid-template-columns: 42px minmax(190px, 1fr) minmax(160px, 0.8fr) 16px;
   align-items: center;
   gap: 14px;
   padding: 12px 17px;
+  border: 0;
+  background: transparent;
   color: var(--text-100);
+  cursor: pointer;
+  text-align: left;
 }
 
 .employee-avatar {
@@ -150,6 +154,21 @@
   white-space: nowrap;
 }
 
+.employee-card__chevron {
+  color: var(--text-300);
+  font-family: var(--font-ui);
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.employee-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 17px 12px;
+  border-top: 1px solid var(--border-soft);
+  background-color: rgba(22, 24, 21, 0.58);
+}
+
 .employee-form-panel .form-actions {
   margin-top: 17px;
 }
@@ -170,7 +189,7 @@
 
 @media (max-width: 980px) {
   .employee-card__summary {
-    grid-template-columns: 42px minmax(170px, 1fr) minmax(140px, 0.8fr);
+    grid-template-columns: 42px minmax(170px, 1fr) minmax(140px, 0.8fr) 16px;
   }
 }
 
@@ -208,7 +227,7 @@
   }
 
   .employee-card__summary {
-    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-columns: 38px minmax(0, 1fr) 14px;
     gap: 10px;
     padding: 11px;
   }
@@ -225,6 +244,15 @@
   .employee-card__email {
     grid-column: 2;
     font-size: 0.72rem;
+  }
+
+  .employee-card__chevron {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .employee-card__actions {
+    padding: 10px 12px;
   }
 
   .form-actions {

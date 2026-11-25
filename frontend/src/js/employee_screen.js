@@ -8,9 +8,17 @@ const roleLabels = {
   atendente: 'Atendente',
   attendant: 'Atendente',
 };
+const roleFormValues = {
+  diretor: 'director',
+  director: 'director',
+  gerente: 'manager',
+  farmaceutico: 'pharmacist',
+  atendente: 'attendant',
+};
 
 const API_PORT = window.desktopEnv?.apiPort || '5055';
 const EMPLOYEES_API_URL = `http://127.0.0.1:${API_PORT}/api/employees`;
+const EDIT_EMPLOYEE_URL = `http://127.0.0.1:${API_PORT}/api/employees/email`;
 const BRANCHES_API_URL = `http://127.0.0.1:${API_PORT}/api/branches`;
 const ACCESS_TOKEN_KEY = 'pharmaStock.accessToken';
 const LOGIN_SCREEN_URL = '../../public/index.html';
@@ -36,6 +44,9 @@ let branches = [];
 let branchesLoadState = 'loading';
 let employeesLoadState = 'loading';
 let employeesLoadRequest = 0;
+let activeEmployeeEmail = null;
+let editingEmployeeEmail = null;
+let editingOriginalRole = null;
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -55,11 +66,11 @@ function normalizeRole(role) {
 }
 
 function mapEmployee(employee) {
-  const role = normalizeRole(employee.tipo_usuario);
+  const normalizedRole = normalizeRole(employee.tipo_usuario);
   return {
     firstName: employee.nome,
     lastName: employee.sobrenome,
-    role,
+    role: roleFormValues[normalizedRole] || normalizedRole,
     email: employee.email,
     branch: employee.filial || 'Diretoria',
   };
@@ -112,31 +123,54 @@ function renderEmployees() {
         : 'Nenhum funcionário cadastrado.';
   }
 
-  employeeList.innerHTML = employees.map((employee) => `
+  employeeList.innerHTML = employees.map((employee) => {
+    const expanded = activeEmployeeEmail === employee.email;
+    return `
     <article class="employee-card">
-      <div class="employee-card__summary">
+      <button class="employee-card__summary" type="button" data-employee-toggle="${escapeHtml(employee.email)}" aria-expanded="${expanded}">
         <span class="employee-avatar" aria-hidden="true">${escapeHtml(initials(employee))}</span>
         <span class="employee-card__identity">
           <strong>${escapeHtml(employee.firstName)} ${escapeHtml(employee.lastName)}</strong>
           <span>${escapeHtml(roleLabels[employee.role] || employee.role)} <span aria-hidden="true">·</span> ${escapeHtml(employee.branch)}</span>
         </span>
         <span class="employee-card__email">${escapeHtml(employee.email)}</span>
-      </div>
-    </article>`).join('');
+        <span class="employee-card__chevron" aria-hidden="true">${expanded ? '−' : '+'}</span>
+      </button>
+      ${expanded ? `<div class="employee-card__actions"><button class="text-button" type="button" data-employee-edit="${escapeHtml(employee.email)}">Editar funcionário</button></div>` : ''}
+    </article>`;
+  }).join('');
 }
 
 function updateEmployeeFields() {
+  const isEditing = editingEmployeeEmail !== null;
   const isDirector = employeeRole.value === 'director';
   const isPharmacist = employeeRole.value === 'pharmacist';
   const branchField = document.querySelector('#employee-branch-field');
   const crfField = document.querySelector('#employee-crf-field');
   const crfInput = document.querySelector('#employee-crf');
+  const cpfField = document.querySelector('#employee-cpf-field');
+  const codeField = document.querySelector('#employee-code-field');
+  const passwordField = document.querySelector('#employee-password-field');
+  const preserveCrf = isEditing && isPharmacist && editingOriginalRole === 'pharmacist';
 
   branchField.hidden = isDirector;
   crfField.hidden = !isPharmacist;
+  cpfField.hidden = isEditing;
+  codeField.hidden = isEditing;
+  passwordField.hidden = isEditing;
+  employeeCpf.required = !isEditing;
+  employeeForm.elements.internalCode.required = !isEditing;
+  employeePassword.required = !isEditing;
+  document.querySelector('#employee-crf-edit-hint').hidden = !preserveCrf;
   employeeBranch.required = !isDirector;
   employeeBranch.disabled = !isDirector && (branchesLoadState !== 'ready' || branches.length === 0);
-  crfInput.required = isPharmacist;
+  crfInput.required = isPharmacist && !preserveCrf;
+}
+
+function selectEmployeeBranch(name) {
+  if (!name || branchesLoadState !== 'ready') return;
+  const branch = branches.find((item) => item.nome_filial.toLocaleLowerCase('pt-BR') === name.toLocaleLowerCase('pt-BR'));
+  employeeBranch.value = branch ? String(branch.id_filial) : '';
 }
 
 function getAccessToken() {
@@ -237,6 +271,10 @@ async function loadBranches() {
     employeeBranch.innerHTML = '<option value="">Não foi possível carregar filiais</option>';
   }
 
+  if (editingEmployeeEmail) {
+    const employee = employees.find((item) => item.email === editingEmployeeEmail);
+    if (employee) selectEmployeeBranch(employee.branch);
+  }
   updateEmployeeFields();
 }
 
@@ -245,12 +283,18 @@ function closeEmployeeForm() {
   employeeCreateCard.hidden = false;
   employeeForm.reset();
   employeeRole.value = '';
-  employeePassword.required = false;
+  editingEmployeeEmail = null;
+  editingOriginalRole = null;
+  document.querySelector('#employee-form-kicker').textContent = 'Novo acesso';
+  document.querySelector('#employee-form-title').textContent = 'Cadastrar funcionário';
+  saveEmployeeButton.textContent = 'Cadastrar funcionário';
   clearFormFeedback();
   updateEmployeeFields();
 }
 
 function openNewEmployeeForm() {
+  editingEmployeeEmail = null;
+  editingOriginalRole = null;
   employeeForm.reset();
   employeeRole.value = '';
   employeePassword.required = true;
@@ -262,6 +306,28 @@ function openNewEmployeeForm() {
   employeeCreateCard.hidden = true;
   employeeFormPanel.hidden = false;
   employeeRole.focus();
+}
+
+function openEditEmployeeForm(employee) {
+  editingEmployeeEmail = employee.email;
+  editingOriginalRole = employee.role;
+  employeeForm.reset();
+  employeeRole.value = employee.role;
+  employeeForm.elements.firstName.value = employee.firstName;
+  employeeForm.elements.lastName.value = employee.lastName;
+  employeeForm.elements.email.value = employee.email;
+  employeeForm.elements.crf.value = '';
+  employeeBranch.value = '';
+  selectEmployeeBranch(employee.branch);
+  document.querySelector('#employee-form-kicker').textContent = 'Editar acesso';
+  document.querySelector('#employee-form-title').textContent = `Editar ${employee.firstName} ${employee.lastName}`;
+  saveEmployeeButton.textContent = 'Salvar alterações';
+  clearFormFeedback();
+  updateEmployeeFields();
+  employeeCreateCard.hidden = true;
+  employeeFormPanel.hidden = false;
+  employeeFormPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelector('#employee-first-name').focus();
 }
 
 async function createEmployee(values) {
@@ -331,11 +397,94 @@ async function createEmployee(values) {
   }
 }
 
+async function editEmployee(values) {
+  if (!editingEmployeeEmail) return;
+
+  const token = getAccessToken();
+  if (!token) {
+    showFormFeedback('Sua sessão expirou. Entre novamente para editar funcionários.');
+    return;
+  }
+  if (values.role !== 'director' && (branchesLoadState !== 'ready' || branches.length === 0)) {
+    showFormFeedback('Não foi possível carregar uma filial. Confira a conexão e tente novamente.');
+    return;
+  }
+
+  const payload = {
+    role: values.role,
+    first_name: values.firstName.trim(),
+    last_name: values.lastName.trim(),
+    email: values.email.trim(),
+  };
+  if (values.role !== 'director') payload.branch_id = values.branch;
+  if (values.role === 'pharmacist' && values.crf.trim()) payload.crf = values.crf.trim();
+
+  const employeeEmailBeingEdited = editingEmployeeEmail;
+  saveEmployeeButton.disabled = true;
+  saveEmployeeButton.textContent = 'Salvando...';
+  clearFormFeedback();
+
+  try {
+    const response = await fetch(
+      `${EDIT_EMPLOYEE_URL}/${encodeURIComponent(employeeEmailBeingEdited)}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      },
+    );
+    const result = await readJsonResponse(response, 'O servidor retornou uma resposta inválida.');
+
+    if (response.status === 401) {
+      expireSession();
+      return;
+    }
+    if (!response.ok || !result.ok) {
+      const details = result.errors ? Object.values(result.errors).join(' ') : '';
+      throw new Error([result.message, details].filter(Boolean).join(' ') || 'Não foi possível atualizar o funcionário.');
+    }
+
+    closeEmployeeForm();
+    activeEmployeeEmail = values.email.trim().toLowerCase();
+    const refreshed = await loadEmployees();
+    if (refreshed) {
+      showPageFeedback(result.message || 'Funcionário atualizado com sucesso.');
+    } else if (employeesLoadState !== 'error') {
+      showPageFeedback('Alterações salvas. Não foi possível atualizar a lista agora.', 'error');
+    }
+  } catch (error) {
+    showFormFeedback(error.message || 'Não foi possível conectar ao servidor. Verifique se o backend está em execução.');
+  } finally {
+    saveEmployeeButton.disabled = false;
+    saveEmployeeButton.textContent = editingEmployeeEmail ? 'Salvar alterações' : 'Cadastrar funcionário';
+  }
+}
+
 document.querySelector('#open-employee-form').addEventListener('click', openNewEmployeeForm);
 document.querySelector('#close-employee-form').addEventListener('click', closeEmployeeForm);
 document.querySelector('#cancel-employee-form').addEventListener('click', closeEmployeeForm);
 document.querySelector('#retry-employees').addEventListener('click', loadEmployees);
 employeeRole.addEventListener('change', updateEmployeeFields);
+
+employeeList.addEventListener('click', (event) => {
+  const toggle = event.target.closest('[data-employee-toggle]');
+  if (toggle) {
+    activeEmployeeEmail = activeEmployeeEmail === toggle.dataset.employeeToggle
+      ? null
+      : toggle.dataset.employeeToggle;
+    renderEmployees();
+    return;
+  }
+
+  const editButton = event.target.closest('[data-employee-edit]');
+  if (editButton) {
+    const employee = employees.find((item) => item.email === editButton.dataset.employeeEdit);
+    if (employee) openEditEmployeeForm(employee);
+  }
+});
 
 employeeCpf.addEventListener('input', () => {
   const digits = employeeCpf.value.replace(/\D/g, '').slice(0, 11);
@@ -348,7 +497,11 @@ employeeCpf.addEventListener('input', () => {
 employeeForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const values = Object.fromEntries(new FormData(employeeForm).entries());
-  createEmployee(values);
+  if (editingEmployeeEmail) {
+    editEmployee(values);
+  } else {
+    createEmployee(values);
+  }
 });
 
 renderEmployees();

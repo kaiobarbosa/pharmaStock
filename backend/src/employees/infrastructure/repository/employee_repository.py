@@ -15,6 +15,14 @@ class EmployeeRepositoryError(Exception):
     """Raised when employee data cannot be read or stored."""
 
 
+class EmployeeNotFound(Exception):
+    """Raised when the employee being edited does not exist."""
+
+
+class EmployeeEditConflict(Exception):
+    """Raised when an employee changed after it was loaded for editing."""
+
+
 _EMPLOYEE_LIST_SELECT = """
     SELECT u.nome_usuario AS nome,
            u.sobrenome_usuario AS sobrenome,
@@ -75,6 +83,31 @@ def get_user_role_by_email(email):
             if row is None:
                 return None
             return {"role": row[0], "active": bool(row[1])}
+        finally:
+            cursor.close()
+    except Error as error:
+        raise EmployeeRepositoryError from error
+    finally:
+        connection.close()
+
+
+def get_employee_role_by_email(email):
+    connection = conectar_banco()
+    try:
+        cursor = connection.cursor()
+        try:
+            cursor.execute(
+                """
+                SELECT u.tipo_usuario
+                FROM usuario AS u
+                INNER JOIN funcionario AS f ON f.id_usuario = u.id_usuario
+                WHERE LOWER(u.email_usuario) = LOWER(%s)
+                LIMIT 1
+                """,
+                (email,),
+            )
+            row = cursor.fetchone()
+            return {"role": row[0]} if row else None
         finally:
             cursor.close()
     except Error as error:
@@ -172,6 +205,116 @@ def create_new_employee(
         finally:
             cursor.close()
     except (DuplicateEmployeeData, EmployeeBranchNotFound):
+        connection.rollback()
+        raise
+    except IntegrityError as error:
+        connection.rollback()
+        if error.errno == 1062:
+            raise DuplicateEmployeeData from error
+        raise EmployeeRepositoryError from error
+    except Error as error:
+        connection.rollback()
+        raise EmployeeRepositoryError from error
+    finally:
+        connection.close()
+
+    return True
+
+
+def update_employee_data(
+    current_email,
+    expected_current_role,
+    nome,
+    sobrenome,
+    email,
+    tipo_usuario,
+    crf,
+    branch_reference=None,
+):
+    connection = conectar_banco()
+
+    try:
+        cursor = connection.cursor()
+        try:
+            cursor.execute(
+                """
+                SELECT u.id_usuario, u.tipo_usuario, f.id_filial
+                FROM usuario AS u
+                INNER JOIN funcionario AS f ON f.id_usuario = u.id_usuario
+                WHERE LOWER(u.email_usuario) = LOWER(%s)
+                LIMIT 1
+                FOR UPDATE
+                """,
+                (current_email,),
+            )
+            employee_row = cursor.fetchone()
+            if employee_row is None:
+                raise EmployeeNotFound
+            id_usuario, current_role, current_id_filial = employee_row
+            if current_role != expected_current_role:
+                raise EmployeeEditConflict
+
+            cursor.execute(
+                """
+                SELECT 1 FROM usuario
+                WHERE LOWER(email_usuario) = LOWER(%s) AND id_usuario <> %s
+                LIMIT 1
+                """,
+                (email, id_usuario),
+            )
+            if cursor.fetchone():
+                raise DuplicateEmployeeData
+
+            is_existing_director = str(current_role).strip().lower() in ("diretor", "director")
+            preserve_director_branch = tipo_usuario == "diretor" and is_existing_director
+            id_filial = current_id_filial if preserve_director_branch else "Diretoria"
+            if tipo_usuario != "diretor":
+                cursor.execute(
+                    """
+                    SELECT id_filial
+                    FROM filial
+                    WHERE id_filial = %s OR LOWER(nome_filial) = LOWER(%s)
+                    LIMIT 1
+                    """,
+                    (branch_reference, branch_reference),
+                )
+                branch_row = cursor.fetchone()
+                if branch_row is None:
+                    raise EmployeeBranchNotFound
+                id_filial = branch_row[0]
+
+            cursor.execute(
+                """
+                UPDATE usuario
+                SET nome_usuario = %s, sobrenome_usuario = %s,
+                    email_usuario = %s, tipo_usuario = %s
+                WHERE id_usuario = %s
+                """,
+                (nome, sobrenome, email, tipo_usuario, id_usuario),
+            )
+            cursor.execute(
+                """
+                UPDATE funcionario
+                SET email_verificado = %s, id_filial = %s,
+                    crf_funcionario = COALESCE(%s, crf_funcionario)
+                WHERE id_usuario = %s
+                """,
+                (email, id_filial, crf, id_usuario),
+            )
+            if not preserve_director_branch:
+                cursor.execute(
+                    "DELETE FROM usuario_filial WHERE id_usuario = %s",
+                    (id_usuario,),
+                )
+            if tipo_usuario != "diretor":
+                cursor.execute(
+                    "INSERT INTO usuario_filial (id_usuario, id_filial) VALUES (%s, %s)",
+                    (id_usuario, id_filial),
+                )
+            connection.commit()
+        finally:
+            cursor.close()
+    except (DuplicateEmployeeData, EmployeeBranchNotFound, EmployeeNotFound, EmployeeEditConflict):
         connection.rollback()
         raise
     except IntegrityError as error:

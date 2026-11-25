@@ -55,7 +55,7 @@
                 </div>
                 <form id="employee-form" class="standard-form">
                   <div class="form-grid">
-                    <div class="field field--wide">
+                    <div class="field field--wide" id="employee-role-field">
                       <label for="employee-role">Cargo</label>
                       <select id="employee-role" name="role" required>
                         <option value="" selected disabled>Selecione um cargo</option>
@@ -67,12 +67,12 @@
                     </div>
                     <div class="field"><label for="employee-first-name">Nome</label><input id="employee-first-name" name="firstName" maxlength="100" autocomplete="given-name" required /></div>
                     <div class="field"><label for="employee-last-name">Sobrenome</label><input id="employee-last-name" name="lastName" maxlength="100" autocomplete="family-name" required /></div>
-                    <div class="field"><label for="employee-cpf">CPF</label><input id="employee-cpf" name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off" required /></div>
-                    <div class="field"><label for="employee-code">Código interno</label><input id="employee-code" name="internalCode" maxlength="8" required /></div>
+                    <div class="field" id="employee-cpf-field"><label for="employee-cpf">CPF</label><input id="employee-cpf" name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off" required /></div>
+                    <div class="field" id="employee-code-field"><label for="employee-code">Código interno</label><input id="employee-code" name="internalCode" maxlength="8" required /></div>
                     <div class="field" id="employee-branch-field"><label for="employee-branch">Filial</label><select id="employee-branch" name="branch" required><option value="">Carregando filiais...</option></select></div>
-                    <div class="field" id="employee-crf-field" hidden><label for="employee-crf">CRF</label><input id="employee-crf" name="crf" maxlength="20" placeholder="Ex.: CRF-SP 123456" /></div>
+                    <div class="field" id="employee-crf-field" hidden><label for="employee-crf">CRF</label><input id="employee-crf" name="crf" maxlength="20" placeholder="Ex.: CRF-SP 123456" /><small class="field-hint" id="employee-crf-edit-hint" hidden>O CRF atual será mantido se ficar vazio; preencha para atualizá-lo.</small></div>
                     <div class="field"><label for="employee-email">E-mail</label><input id="employee-email" name="email" type="email" maxlength="254" autocomplete="email" required /></div>
-                    <div class="field"><label for="employee-password">Senha</label><input id="employee-password" name="password" type="password" maxlength="72" autocomplete="new-password" required /></div>
+                    <div class="field" id="employee-password-field"><label for="employee-password">Senha</label><input id="employee-password" name="password" type="password" maxlength="72" autocomplete="new-password" required /></div>
                   </div>
                   <div class="form-actions">
                     <p class="form-feedback" id="employee-form-feedback" role="status" aria-live="polite" hidden></p>
