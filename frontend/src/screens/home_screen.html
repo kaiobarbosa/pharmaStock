@@ -28,7 +28,7 @@
               <div class="home-section-heading">
                 <p class="section-kicker">Consulta rápida</p>
                 <h1 id="product-search-title">Encontre um produto</h1>
-                <p>Pesquise no catálogo de produtos cadastrados.</p>
+                <p>Pesquise pelo início do nome, princípio ativo ou código do produto.</p>
               </div>
 
               <form id="product-search-form" class="product-search" role="search" novalidate>
@@ -41,12 +41,21 @@
                   id="product-search-input"
                   name="query"
                   type="search"
-                  placeholder="Nome, princípio ativo ou código do produto"
+                  maxlength="100"
+                  placeholder="Início do nome, princípio ativo ou código do produto"
                   autocomplete="off"
                 />
                 <button class="product-search__button" type="submit">Buscar</button>
               </form>
               <p class="product-search__feedback" id="product-search-feedback" role="status" aria-live="polite" hidden></p>
+              <section class="product-search-results" id="product-search-results" aria-labelledby="product-search-results-title" hidden>
+                <div class="product-search-results__heading">
+                  <h2 id="product-search-results-title">Resultados</h2>
+                  <span id="product-search-result-count"></span>
+                </div>
+                <ul class="product-search-results__list" id="product-search-result-list"></ul>
+                <p class="product-search-results__empty" id="product-search-empty" hidden></p>
+              </section>
             </section>
 
             <section class="recent-sales-section" aria-labelledby="recent-sales-title">

@@ -29,9 +29,8 @@
                 <div>
                   <p class="section-kicker">Gestão de produtos</p>
                   <h1 id="products-title">Produtos e estoque</h1>
-                  <p>Cadastre produtos e consulte os itens disponíveis nas filiais.</p>
+                  <p>Cadastre produtos e consulte o catálogo registrado no banco de dados.</p>
                 </div>
-                <span class="demo-badge">Dados demonstrativos</span>
               </div>
 
               <div class="product-overview-grid">
@@ -49,10 +48,10 @@
                   <span class="action-card__icon action-card__icon--muted" aria-hidden="true">▦</span>
                   <div>
                     <p class="section-kicker">Consulta</p>
-                    <h2>Acessar estoque</h2>
-                    <p>Pesquise os produtos pelo nome, código de barras ou filial.</p>
+                    <h2>Produtos cadastrados</h2>
+                    <p>Consulte os dados gerais e específicos de cada categoria.</p>
                   </div>
-                  <button class="secondary-button" id="open-inventory" type="button">Ver estoque</button>
+                  <button class="secondary-button" id="open-inventory" type="button">Ver produtos</button>
                 </article>
               </div>
             </section>
@@ -86,13 +85,13 @@
                           <option value="equipment">Equipamentos</option>
                         </select>
                       </div>
-                      <div class="field"><label for="product-name">Nome</label><input id="product-name" name="name" required /></div>
-                      <div class="field"><label for="product-brand">Marca</label><input id="product-brand" name="brand" required /></div>
-                      <div class="field field--wide"><label for="product-description">Descrição</label><textarea id="product-description" name="description" rows="2" required></textarea></div>
+                      <div class="field"><label for="product-name">Nome</label><input id="product-name" name="name" maxlength="100" required /></div>
+                      <div class="field"><label for="product-brand">Marca</label><input id="product-brand" name="brand" maxlength="100" required /></div>
+                      <div class="field field--wide"><label for="product-description">Descrição</label><textarea id="product-description" name="description" rows="2" maxlength="255" required></textarea></div>
                       <div class="field"><label for="product-price">Preço (R$)</label><input id="product-price" name="price" type="number" min="0" step="0.01" placeholder="0,00" required /></div>
-                      <div class="field"><label for="product-barcode">Código de barras</label><input id="product-barcode" name="barcode" inputmode="numeric" required /></div>
-                      <div class="field"><label for="product-quantity">Quantidade</label><input id="product-quantity" name="quantity" type="number" min="0" step="1" required /></div>
-                      <div class="field"><label for="product-branch">Filial</label><select id="product-branch" name="branch" required><option value="Filial Centro">Filial Centro</option><option value="Filial Jardins">Filial Jardins</option><option value="Filial Norte">Filial Norte</option></select></div>
+                      <div class="field"><label for="product-barcode">Código de barras</label><input id="product-barcode" name="barcode" inputmode="numeric" maxlength="20" required /></div>
+                      <div class="field"><label for="product-quantity">Quantidade</label><input id="product-quantity" name="quantity" type="number" min="0" max="9999999999" step="1" required /></div>
+                      <div class="field"><label for="product-branch">Filial</label><select id="product-branch" name="branch" required><option value="">Carregando filiais...</option></select></div>
                     </div>
                   </section>
 
@@ -118,9 +117,9 @@
             <section class="product-view" data-product-view="stock" aria-labelledby="inventory-title" hidden>
               <div class="screen-heading screen-heading--compact">
                 <div>
-                  <p class="section-kicker">Consulta de estoque</p>
-                  <h1 id="inventory-title">Estoque de produtos</h1>
-                  <p>Consulte os itens do catálogo por nome ou código de barras.</p>
+                  <p class="section-kicker">Consulta de produtos</p>
+                  <h1 id="inventory-title">Produtos cadastrados</h1>
+                  <p>Consulte os dados gerais, a categoria e as filiais vinculadas.</p>
                 </div>
                 <button class="text-button" type="button" data-product-view-open="overview">Voltar</button>
               </div>
@@ -128,31 +127,30 @@
               <form class="inventory-filters" id="inventory-filter-form">
                 <div class="field inventory-search-field">
                   <label for="inventory-query">Produto</label>
-                  <input id="inventory-query" name="query" type="search" placeholder="Nome ou código de barras" />
+                  <input id="inventory-query" name="query" type="search" maxlength="100" placeholder="Início do nome, princípio ativo ou código do produto" />
                 </div>
                 <div class="field inventory-branch-field">
                   <label for="inventory-branch">Filial</label>
                   <select id="inventory-branch" name="branch">
-                    <option value="all">Geral</option>
-                    <option value="Filial Centro">Filial Centro</option>
-                    <option value="Filial Jardins">Filial Jardins</option>
-                    <option value="Filial Norte">Filial Norte</option>
+                    <option value="all">Todas as filiais</option>
                   </select>
                 </div>
                 <button class="primary-button" type="submit">Pesquisar</button>
               </form>
 
               <div class="inventory-results-heading">
-                <h2>Produtos cadastrados</h2>
+                <h2>Catálogo</h2>
                 <span id="inventory-result-count" class="result-count"></span>
               </div>
+              <p class="catalog-source" id="products-source" role="status" aria-live="polite"></p>
               <div class="data-table-wrap">
                 <table class="data-table inventory-table">
-                  <thead><tr><th scope="col">ID do produto</th><th scope="col">Nome</th><th scope="col">Quantidade</th><th scope="col">Código de barras</th></tr></thead>
+                  <thead><tr><th scope="col">ID</th><th scope="col">Produto</th><th scope="col">Categoria</th><th scope="col">Detalhes</th><th scope="col">Preço</th><th scope="col">Quantidade</th><th scope="col">Filiais</th><th scope="col">Código de barras</th><th scope="col">Ações</th></tr></thead>
                   <tbody id="inventory-list"></tbody>
                 </table>
               </div>
-              <p class="empty-state" id="inventory-empty" hidden>Nenhum produto corresponde aos filtros selecionados.</p>
+              <p class="empty-state" id="inventory-empty" hidden></p>
+              <button class="secondary-button catalog-retry" id="retry-products" type="button" hidden>Tentar novamente</button>
             </section>
           </div>
         </div>

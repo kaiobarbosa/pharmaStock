@@ -26,6 +26,15 @@ from backend.src.employees.presentation.select_all_employee_presentation import 
 from backend.src.employees.presentation.edit_employee_data_presentation import (
     blueprint_edit_employee,
 )
+from backend.src.products.presentation.create_new_product_presentation import (
+    blueprint_create_product,
+)
+from backend.src.products.presentation.select_all_products_presentation import (
+    blueprint_select_all_products,
+)
+from backend.src.products.presentation.select_products_by_filter_presentation import (
+    blueprint_select_products_by_filter,
+)
 
 load_dotenv()
 
@@ -45,6 +54,9 @@ app.register_blueprint(blueprint_edit_branch)
 app.register_blueprint(blueprint_create_employee)
 app.register_blueprint(blueprint_select_all_employees)
 app.register_blueprint(blueprint_edit_employee)
+app.register_blueprint(blueprint_create_product)
+app.register_blueprint(blueprint_select_all_products)
+app.register_blueprint(blueprint_select_products_by_filter)
 
 @app.get("/health")
 def health():

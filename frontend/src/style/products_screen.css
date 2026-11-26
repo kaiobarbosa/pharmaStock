@@ -146,7 +146,11 @@
 }
 
 .inventory-table {
-  min-width: 630px;
+  min-width: 1420px;
+}
+
+.inventory-table td {
+  vertical-align: top;
 }
 
 .product-id {
@@ -165,6 +169,52 @@
   margin-top: 4px;
   color: var(--text-300);
   font-size: 0.72rem;
+}
+
+.inventory-product-name + small + small {
+  max-width: 240px;
+  white-space: normal;
+  line-height: 1.4;
+}
+
+.product-details-cell {
+  max-width: 350px;
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.catalog-source {
+  color: var(--text-300);
+  font-size: 0.78rem;
+}
+
+.catalog-actions {
+  display: flex;
+  min-width: 84px;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.catalog-action-button {
+  padding: 6px 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: 7px;
+  background: var(--surface-600);
+  color: var(--text-300);
+  font-size: 0.68rem;
+  cursor: not-allowed;
+}
+
+.catalog-action-button--danger {
+  color: var(--danger);
+}
+
+.catalog-action-button:disabled {
+  opacity: 0.62;
+}
+
+.catalog-retry {
+  align-self: center;
 }
 
 .quantity-pill {
