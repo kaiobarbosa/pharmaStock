@@ -11,6 +11,12 @@ from backend.src.login_and_create_account.presentation.verify_director_exist_pre
     blueprint_check_director_exists,)   
 from backend.src.login_and_create_account.presentation.login_presentation import (
     blueprint_login,)
+from backend.src.login_and_create_account.presentation.select_user_information_presentation import (
+    blueprint_select_user_information,
+)
+from backend.src.login_and_create_account.presentation.update_user_information_presentation import (
+    blueprint_update_user_information,
+)
 from backend.src.branchs.presentation.new_branch_presentation import (
     blueprint_create_branch,
 )
@@ -49,6 +55,8 @@ CORS(app, resources={r"/*": {"origins": ["null", "file://"]}})
 app.register_blueprint(blueprint_create_director_account)
 app.register_blueprint(blueprint_check_director_exists)
 app.register_blueprint(blueprint_login)
+app.register_blueprint(blueprint_select_user_information)
+app.register_blueprint(blueprint_update_user_information)
 app.register_blueprint(blueprint_create_branch)
 app.register_blueprint(blueprint_edit_branch)
 app.register_blueprint(blueprint_create_employee)

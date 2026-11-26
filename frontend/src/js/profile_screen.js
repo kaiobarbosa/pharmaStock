@@ -1,26 +1,35 @@
-const profile = {
-  role: 'Farmacêutica',
-  firstName: 'Ana Luiza',
-  lastName: 'Ribeiro',
-  internalCode: 'FAR-028',
-  crf: 'CRF-SP 123456',
-  branch: 'Filial Centro',
-  email: 'ana.ribeiro@pharmastock.demo',
-  demoPassword: 'SenhaDemo!2026',
-};
-
-const salesHistory = [
-  { date: '20/11/2026 · 16:42', branch: 'Filial Centro', product: 'Dipirona monoidratada 500 mg' },
-  { date: '20/11/2026 · 14:18', branch: 'Filial Centro', product: 'Protetor solar facial FPS 50' },
-  { date: '19/11/2026 · 11:06', branch: 'Filial Jardins', product: 'Vitamina C 1 g' },
-  { date: '18/11/2026 · 17:31', branch: 'Filial Centro', product: 'Termômetro digital' },
-  { date: '18/11/2026 · 10:25', branch: 'Filial Jardins', product: 'Creme hidratante calmante' },
-];
+const ACCESS_TOKEN_KEY = 'pharmaStock.accessToken';
+const LOGIN_SCREEN_URL = '../../public/index.html';
+const API_PORT = window.desktopEnv?.apiPort || '5055';
+const PROFILE_API_URL = `http://127.0.0.1:${API_PORT}/api/users/me`;
 
 const profileDetailsGrid = document.querySelector('#profile-details-grid');
 const profileEditForm = document.querySelector('#profile-edit-form');
 const profileFeedback = document.querySelector('#profile-page-feedback');
-let passwordVisible = false;
+const editProfileButton = document.querySelector('#edit-profile-button');
+const formFeedback = document.querySelector('#profile-form-feedback');
+const submitButton = profileEditForm.querySelector('[type="submit"]');
+const currentPasswordField = document.querySelector('#profile-current-password-field');
+const currentPasswordInput = profileEditForm.elements.current_password;
+let profile = null;
+
+function redirectToLogin() {
+  try {
+    sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+  } catch (error) {
+    // Navigation still clears the in-memory page if storage is unavailable.
+  }
+  window.location.replace(LOGIN_SCREEN_URL);
+}
+
+function readAccessToken() {
+  try {
+    return sessionStorage.getItem(ACCESS_TOKEN_KEY);
+  } catch (error) {
+    redirectToLogin();
+    return null;
+  }
+}
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -31,113 +40,167 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function formatCpf(value) {
+  const digits = String(value ?? '').replace(/\D/g, '');
+  if (digits.length !== 11) return value || '—';
+  return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+}
+
+function setPageFeedback(message, kind = 'error') {
+  profileFeedback.textContent = message;
+  profileFeedback.dataset.kind = kind;
+  profileFeedback.hidden = !message;
+}
+
+function syncEmailReauthentication() {
+  if (!profile) return;
+  const emailChanged = profileEditForm.elements.email.value.trim().toLowerCase()
+    !== String(profile.email).trim().toLowerCase();
+  currentPasswordField.hidden = !emailChanged;
+  currentPasswordInput.required = emailChanged;
+  if (!emailChanged) currentPasswordInput.value = '';
+}
+
 function renderProfile() {
-  const fullName = `${profile.firstName} ${profile.lastName}`;
-  const initials = `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`.toLocaleUpperCase('pt-BR');
+  const fullName = `${profile.first_name} ${profile.last_name}`.trim();
+  const initials = `${profile.first_name.charAt(0)}${profile.last_name.charAt(0)}`
+    .toLocaleUpperCase('pt-BR');
   document.querySelector('#profile-display-name').textContent = fullName;
-  document.querySelector('#profile-display-branch').textContent = profile.branch;
-  document.querySelector('#profile-avatar').textContent = initials;
-  document.querySelector('.profile-card-heading .section-kicker').textContent = profile.role;
+  document.querySelector('#profile-display-branch').textContent = profile.branch || '—';
+  document.querySelector('#profile-avatar').textContent = initials || '—';
+  document.querySelector('#profile-role').textContent = profile.role || 'Usuário';
 
   const detailItems = [
-    ['Nome', profile.firstName],
-    ['Sobrenome', profile.lastName],
-    ['Código interno', profile.internalCode],
+    ['Nome', profile.first_name],
+    ['Sobrenome', profile.last_name],
+    ['CPF', formatCpf(profile.cpf)],
+    ['Código interno', profile.internal_code],
     ['CRF', profile.crf],
     ['Filial', profile.branch],
     ['E-mail', profile.email],
   ];
-
   profileDetailsGrid.innerHTML = detailItems.map(([label, value]) => `
     <div class="profile-detail">
       <span class="profile-detail__label">${escapeHtml(label)}</span>
-      <span class="profile-detail__value">${escapeHtml(value)}</span>
-    </div>`).join('') + `
-    <div class="profile-detail profile-detail--password">
-      <span class="profile-detail__label">Senha</span>
-      <div class="profile-password-value">
-        <span id="profile-password-value">${passwordVisible ? escapeHtml(profile.demoPassword) : '••••••••••••'}</span>
-        <button class="text-button profile-password-toggle" id="toggle-profile-password" type="button">${passwordVisible ? 'Ocultar senha' : 'Exibir senha'}</button>
-      </div>
-    </div>`;
+      <span class="profile-detail__value">${escapeHtml(value || '—')}</span>
+    </div>`).join('');
 
-  document.querySelector('#profile-sales-history').innerHTML = salesHistory.map((sale) => `
-    <tr>
-      <td>${escapeHtml(sale.date)}</td>
-      <td>${escapeHtml(sale.branch)}</td>
-      <td>${escapeHtml(sale.product)}</td>
-    </tr>`).join('');
-
-  profileEditForm.elements.firstName.value = profile.firstName;
-  profileEditForm.elements.lastName.value = profile.lastName;
-  profileEditForm.elements.internalCode.value = profile.internalCode;
-  profileEditForm.elements.branch.value = profile.branch;
-  profileEditForm.elements.crf.value = profile.crf;
-  profileEditForm.elements.email.value = profile.email;
-  profileEditForm.elements.password.value = profile.demoPassword;
+  profileEditForm.elements.first_name.value = profile.first_name || '';
+  profileEditForm.elements.last_name.value = profile.last_name || '';
+  profileEditForm.elements.cpf.value = profile.cpf || '';
+  profileEditForm.elements.email.value = profile.email || '';
+  currentPasswordInput.value = '';
+  syncEmailReauthentication();
+  editProfileButton.hidden = false;
 }
 
-function cancelProfileEdit() {
+function closeProfileEdit() {
   profileEditForm.hidden = true;
   profileDetailsGrid.hidden = false;
-  document.querySelector('#edit-profile-button').hidden = false;
-  profileEditForm.elements.firstName.value = profile.firstName;
-  profileEditForm.elements.lastName.value = profile.lastName;
-  profileEditForm.elements.internalCode.value = profile.internalCode;
-  profileEditForm.elements.branch.value = profile.branch;
-  profileEditForm.elements.crf.value = profile.crf;
-  profileEditForm.elements.email.value = profile.email;
-  profileEditForm.elements.password.value = profile.demoPassword;
+  editProfileButton.hidden = false;
+  formFeedback.hidden = true;
+  if (profile) {
+    profileEditForm.elements.first_name.value = profile.first_name || '';
+    profileEditForm.elements.last_name.value = profile.last_name || '';
+    profileEditForm.elements.cpf.value = profile.cpf || '';
+    profileEditForm.elements.email.value = profile.email || '';
+    currentPasswordInput.value = '';
+    syncEmailReauthentication();
+  }
 }
 
-document.querySelectorAll('[data-profile-tab]').forEach((tab) => {
-  tab.addEventListener('click', () => {
-    if (tab.dataset.profileTab === 'history' && !profileEditForm.hidden) cancelProfileEdit();
+async function loadProfile() {
+  const token = readAccessToken();
+  if (!token) {
+    redirectToLogin();
+    return;
+  }
 
-    document.querySelectorAll('[data-profile-tab]').forEach((item) => {
-      const selected = item === tab;
-      item.classList.toggle('is-active', selected);
-      item.setAttribute('aria-selected', String(selected));
+  try {
+    const response = await fetch(PROFILE_API_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
     });
-    document.querySelectorAll('[data-profile-panel]').forEach((panel) => {
-      panel.hidden = panel.dataset.profilePanel !== tab.dataset.profileTab;
-    });
-  });
-});
+    const result = await response.json();
+    if (response.status === 401) {
+      redirectToLogin();
+      return;
+    }
+    if (!response.ok || !result.ok || !result.user) {
+      throw new Error(result.message || 'Não foi possível carregar o perfil.');
+    }
 
-document.querySelector('#edit-profile-button').addEventListener('click', () => {
+    profile = result.user;
+    renderProfile();
+    setPageFeedback('');
+  } catch (error) {
+    setPageFeedback(error.message || 'Não foi possível conectar ao servidor.');
+    document.querySelector('#profile-display-name').textContent = 'Perfil indisponível';
+  }
+}
+
+editProfileButton.addEventListener('click', () => {
   profileDetailsGrid.hidden = true;
-  document.querySelector('#edit-profile-button').hidden = true;
+  editProfileButton.hidden = true;
   profileEditForm.hidden = false;
-  profileEditForm.elements.firstName.focus();
+  profileEditForm.elements.first_name.focus();
 });
 
-document.querySelector('#cancel-profile-edit').addEventListener('click', cancelProfileEdit);
+document.querySelector('#cancel-profile-edit').addEventListener('click', closeProfileEdit);
+profileEditForm.elements.email.addEventListener('input', syncEmailReauthentication);
 
-profileDetailsGrid.addEventListener('click', (event) => {
-  if (!event.target.closest('#toggle-profile-password')) return;
-  passwordVisible = !passwordVisible;
-  const passwordValue = document.querySelector('#profile-password-value');
-  passwordValue.textContent = passwordVisible ? profile.demoPassword : '••••••••••••';
-  event.target.closest('#toggle-profile-password').textContent = passwordVisible ? 'Ocultar senha' : 'Exibir senha';
-});
-
-profileEditForm.addEventListener('submit', (event) => {
+profileEditForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  const values = Object.fromEntries(new FormData(profileEditForm).entries());
-  profile.firstName = values.firstName.trim();
-  profile.lastName = values.lastName.trim();
-  profile.internalCode = values.internalCode.trim();
-  profile.branch = values.branch;
-  profile.crf = values.crf.trim();
-  profile.email = values.email.trim();
-  if (values.password.trim()) profile.demoPassword = values.password;
+  const token = readAccessToken();
+  if (!token || !profile) {
+    redirectToLogin();
+    return;
+  }
 
-  passwordVisible = false;
-  renderProfile();
-  cancelProfileEdit();
-  profileFeedback.textContent = 'As informações do perfil foram atualizadas neste protótipo.';
-  profileFeedback.hidden = false;
+  formFeedback.hidden = true;
+  submitButton.disabled = true;
+  const formData = new FormData(profileEditForm);
+  const payload = Object.fromEntries(formData.entries());
+
+  try {
+    const response = await fetch(PROFILE_API_URL, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+      cache: 'no-store',
+    });
+    const result = await response.json();
+    if (response.status === 401) {
+      redirectToLogin();
+      return;
+    }
+    if (!response.ok || !result.ok || !result.user || !result.access_token) {
+      const details = result.errors ? Object.values(result.errors).join(' ') : '';
+      throw new Error([result.message, details].filter(Boolean).join(' ')
+        || 'Não foi possível atualizar o perfil.');
+    }
+
+    try {
+      sessionStorage.setItem(ACCESS_TOKEN_KEY, result.access_token);
+    } catch (error) {
+      redirectToLogin();
+      return;
+    }
+    profile = result.user;
+    renderProfile();
+    closeProfileEdit();
+    setPageFeedback(result.message, 'success');
+  } catch (error) {
+    formFeedback.textContent = error.message || 'Não foi possível conectar ao servidor.';
+    formFeedback.dataset.kind = 'error';
+    formFeedback.hidden = false;
+  } finally {
+    currentPasswordInput.value = '';
+    submitButton.disabled = false;
+  }
 });
 
-renderProfile();
+loadProfile();

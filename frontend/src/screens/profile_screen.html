@@ -26,28 +26,22 @@
             <p class="page-feedback" id="profile-page-feedback" role="status" aria-live="polite" hidden></p>
             <div class="profile-page-heading">
               <div>
-                <p class="section-kicker">Conta e atividade</p>
+                <p class="section-kicker">Dados da conta</p>
                 <h1>Meu perfil</h1>
-                <p>Consulte seus dados pessoais e o histórico de vendas.</p>
+                <p>Consulte e atualize seus dados pessoais.</p>
               </div>
-              <span class="demo-badge">Dados demonstrativos</span>
               <a class="secondary-button profile-return" href="home_screen.html">Voltar para o início</a>
             </div>
 
-            <nav class="profile-tabs" aria-label="Seções do perfil" role="tablist">
-              <button class="profile-tab is-active" id="profile-tab-details" type="button" role="tab" aria-selected="true" aria-controls="profile-details-panel" data-profile-tab="details">Dados pessoais</button>
-              <button class="profile-tab" id="profile-tab-history" type="button" role="tab" aria-selected="false" aria-controls="profile-history-panel" data-profile-tab="history">Histórico de vendas</button>
-            </nav>
-
-            <section class="profile-panel" id="profile-details-panel" role="tabpanel" aria-labelledby="profile-tab-details" data-profile-panel="details">
+            <section class="profile-panel" id="profile-details-panel" aria-labelledby="profile-display-name">
               <div class="profile-card-heading">
-                <div class="profile-avatar" aria-hidden="true" id="profile-avatar">AR</div>
+                <div class="profile-avatar" aria-hidden="true" id="profile-avatar">—</div>
                 <div>
-                  <p class="section-kicker">Farmacêutica</p>
-                  <h2 id="profile-display-name">Ana Luiza Ribeiro</h2>
-                  <p id="profile-display-branch">Filial Centro</p>
+                  <p class="section-kicker" id="profile-role">Cargo</p>
+                  <h2 id="profile-display-name">Carregando perfil...</h2>
+                  <p id="profile-display-branch">—</p>
                 </div>
-                <button class="primary-button" id="edit-profile-button" type="button">Editar informações</button>
+                <button class="primary-button" id="edit-profile-button" type="button" hidden>Editar informações</button>
               </div>
 
               <div class="profile-details-grid" id="profile-details-grid"></div>
@@ -60,13 +54,11 @@
                   </div>
                 </div>
                 <div class="form-grid">
-                  <div class="field"><label for="profile-first-name">Nome</label><input id="profile-first-name" name="firstName" required /></div>
-                  <div class="field"><label for="profile-last-name">Sobrenome</label><input id="profile-last-name" name="lastName" required /></div>
-                  <div class="field"><label for="profile-code">Código interno</label><input id="profile-code" name="internalCode" required /></div>
-                  <div class="field"><label for="profile-branch">Filial</label><select id="profile-branch" name="branch"><option>Filial Centro</option><option>Filial Jardins</option><option>Filial Norte</option></select></div>
-                  <div class="field"><label for="profile-crf">CRF</label><input id="profile-crf" name="crf" required /></div>
-                  <div class="field"><label for="profile-email">E-mail</label><input id="profile-email" name="email" type="email" required /></div>
-                  <div class="field field--wide"><label for="profile-password">Senha demonstrativa</label><input id="profile-password" name="password" type="password" autocomplete="new-password" required /></div>
+                  <div class="field"><label for="profile-first-name">Nome</label><input id="profile-first-name" name="first_name" maxlength="100" autocomplete="given-name" required /></div>
+                  <div class="field"><label for="profile-last-name">Sobrenome</label><input id="profile-last-name" name="last_name" maxlength="100" autocomplete="family-name" required /></div>
+                  <div class="field"><label for="profile-cpf">CPF</label><input id="profile-cpf" name="cpf" inputmode="numeric" maxlength="14" autocomplete="off" required /></div>
+                  <div class="field"><label for="profile-email">E-mail</label><input id="profile-email" name="email" type="email" maxlength="254" autocomplete="email" required /></div>
+                  <div class="field field--wide" id="profile-current-password-field" hidden><label for="profile-current-password">Senha atual para confirmar a troca do e-mail</label><input id="profile-current-password" name="current_password" type="password" autocomplete="current-password" /></div>
                 </div>
                 <div class="form-actions">
                   <p class="form-feedback" id="profile-form-feedback" role="status" aria-live="polite" hidden></p>
@@ -74,23 +66,6 @@
                   <button class="primary-button" type="submit">Confirmar alterações</button>
                 </div>
               </form>
-            </section>
-
-            <section class="profile-panel profile-history-panel" id="profile-history-panel" role="tabpanel" aria-labelledby="profile-tab-history" data-profile-panel="history" hidden>
-              <div class="list-heading">
-                <div>
-                  <p class="section-kicker">Atividade recente</p>
-                  <h2>Histórico de vendas</h2>
-                  <p>Vendas demonstrativas realizadas pela sua conta.</p>
-                </div>
-                <span class="demo-badge">Dados demonstrativos</span>
-              </div>
-              <div class="data-table-wrap">
-                <table class="data-table profile-history-table">
-                  <thead><tr><th scope="col">Data</th><th scope="col">Filial</th><th scope="col">Produto</th></tr></thead>
-                  <tbody id="profile-sales-history"></tbody>
-                </table>
-              </div>
             </section>
           </div>
         </div>

@@ -38,46 +38,6 @@
   flex: 0 0 auto;
 }
 
-.profile-tabs {
-  display: flex;
-  gap: 7px;
-  padding-bottom: 0;
-  border-bottom: 1px solid var(--border-soft);
-}
-
-.profile-tab {
-  position: relative;
-  min-height: 44px;
-  padding: 0 15px;
-  border: 0;
-  background: transparent;
-  color: var(--text-300);
-  cursor: pointer;
-  font-size: 0.82rem;
-}
-
-.profile-tab::after {
-  position: absolute;
-  right: 12px;
-  bottom: -1px;
-  left: 12px;
-  height: 2px;
-  background-color: transparent;
-  content: '';
-}
-
-.profile-tab:hover {
-  color: var(--text-100);
-}
-
-.profile-tab.is-active {
-  color: var(--accent-400);
-}
-
-.profile-tab.is-active::after {
-  background-color: var(--accent-500);
-}
-
 .profile-panel:not([hidden]) {
   display: flex;
   flex-direction: column;
@@ -161,28 +121,6 @@
   font-size: 0.9rem;
 }
 
-.profile-detail--password {
-  grid-column: 1 / -1;
-}
-
-.profile-password-value {
-  display: flex;
-  align-items: flex-start;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.profile-password-value > span {
-  color: var(--text-100);
-  font-family: var(--font-ui);
-  font-size: 0.9rem;
-  letter-spacing: 0.12em;
-}
-
-.profile-password-toggle {
-  flex: 0 0 auto;
-}
-
 .profile-edit-form {
   padding: 23px 24px;
   border: 1px solid var(--border-soft);
@@ -196,24 +134,6 @@
 
 .profile-edit-form .panel-heading h2 {
   font-size: 1.3rem;
-}
-
-.profile-history-panel .list-heading {
-  margin-bottom: 2px;
-}
-
-.profile-history-table {
-  min-width: 620px;
-}
-
-.profile-history-table td:first-child {
-  min-width: 210px;
-  color: var(--text-300);
-  white-space: nowrap;
-}
-
-.profile-history-table td:nth-child(2) {
-  min-width: 170px;
 }
 
 @media (max-width: 768px) {
@@ -241,16 +161,6 @@
     min-height: 38px;
   }
 
-  .profile-tabs {
-    gap: 0;
-  }
-
-  .profile-tab {
-    flex: 1;
-    padding: 0 8px;
-    font-size: 0.74rem;
-  }
-
   .profile-card-heading {
     align-items: flex-start;
     flex-wrap: wrap;
@@ -266,16 +176,8 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .profile-detail--password {
-    grid-column: auto;
-  }
-
   .profile-edit-form {
     padding: 18px 15px;
   }
 
-  .profile-history-panel .list-heading {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
 }
